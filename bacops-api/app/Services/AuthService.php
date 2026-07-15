@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Illuminate\Auth\Access\AuthorizationException;
 
 class AuthService
 {
@@ -28,14 +27,14 @@ class AuthService
             throw new \Exception('Invalid credentials');
         }
 
-        // Access token — short TTL from config/jwt.php
-        $accessToken = JWTAuth::claims(['type' => 'access'])
-            ->fromUser($user);
+        // Access token — uses default TTL from config/jwt.php
+        $accessToken = JWTAuth::claims(['type' => 'access'])->fromUser($user);
 
-        // Refresh token — issued with a longer custom TTL
-        $refreshToken = JWTAuth::factory()->setTTL(config('jwt.refresh_ttl'))
-            ->claims(['type' => 'refresh'])
-            ->fromSubject($user);
+        // Refresh token — temporarily swap TTL config, generate, then restore
+        $originalTtl = config('jwt.ttl');
+        config(['jwt.ttl' => config('jwt.refresh_ttl')]);
+        $refreshToken = JWTAuth::claims(['type' => 'refresh'])->fromUser($user);
+        config(['jwt.ttl' => $originalTtl]);
 
         return [
             'user' => [
