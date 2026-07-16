@@ -11,17 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rfid', function (Blueprint $table) {
+        Schema::create('commandes_rfid', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->integer('quantite');
+            $table->text('commentaire')->nullable();
+            $table->foreignId('added_by')->constrained('users');
+            $table->timestamp('created_at')->useCurrent();
         });
     }
-
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('rfid');
+        Schema::dropIfExists('commandes_rfid');
     }
 };

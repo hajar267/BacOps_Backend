@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BacTypeController;
-
+use App\Http\Controllers\RfidController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -22,4 +22,7 @@ Route::middleware(['auth:api', 'permission:stock:read'])->group(function () {
 });
 
 Route::post('/bac-types/bac-types', [BacTypeController::class, 'store'])
+    ->middleware(['auth:api', 'permission:stock:create']);
+
+Route::post('/stock/rfids', [RfidController::class, 'store'])
     ->middleware(['auth:api', 'permission:stock:create']);
