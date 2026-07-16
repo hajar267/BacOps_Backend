@@ -30,7 +30,7 @@ class AuthController extends Controller
     public function refresh(RefreshRequest $request)
     {
         try {
-            $result = $this->authService->refresh($request->validated('refresh_token'));
+            $result = $this->authService->refresh($request->validated('refreshToken'));
             return response()->json($result, 200);
         } catch (\Exception $e) {
             return response()->json([

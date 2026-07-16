@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BacTypeController;
 
 
 // Route::get('/user', function (Request $request) {
@@ -11,3 +12,14 @@ use App\Http\Controllers\AuthController;
 
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/refresh', [AuthController::class, 'refresh']);
+
+Route::middleware(['auth:api', 'permission:stock:read'])->group(function () {
+    Route::get('/bac-types/natures', [BacTypeController::class, 'natures']);
+    Route::get('/bac-types/capacites', [BacTypeController::class, 'capacites']);
+    Route::get('/bac-types/matieres', [BacTypeController::class, 'matieres']);
+    Route::get('/bac-types/colors', [BacTypeController::class, 'colors']);
+    Route::get('/bac-types/bac-types', [BacTypeController::class, 'index']);
+});
+
+Route::post('/bac-types/bac-types', [BacTypeController::class, 'store'])
+    ->middleware(['auth:api', 'permission:stock:create']);

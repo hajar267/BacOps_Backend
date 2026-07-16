@@ -9,7 +9,7 @@ class CheckRole
 {
     public function handle(Request $request, Closure $next, ...$allowedRoles)
     {
-        $user = $request->user(); // resolved by auth:api guard, which already ran
+        $user = $request->user(); // resolved by auth:api guard
 
         if (!$user) {
             return response()->json([
