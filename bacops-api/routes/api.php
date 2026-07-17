@@ -8,6 +8,7 @@ use App\Http\Controllers\RfidController;
 use App\Http\Controllers\BacController;
 use App\Http\Controllers\InstallController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\PVController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -44,3 +45,14 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/search/bac/{id}/history', [SearchController::class, 'history']);
     Route::get('/search/bac/location', [SearchController::class, 'locations']);
 });
+
+Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
+    Route::get('/pv', [PVController::class, 'index']);
+    Route::get('/pv/preview', [PVController::class, 'preview']);
+});
+
+Route::post('/pv/download', [PVController::class, 'store'])
+    ->middleware(['auth:api', 'permission:admin:create']);
+
+Route::post('/pv/{id}/signed', [PVController::class, 'uploadSigned'])
+    ->middleware(['auth:api', 'permission:admin:create']);
