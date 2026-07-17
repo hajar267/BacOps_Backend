@@ -5,12 +5,11 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateRfidsStockRequest extends FormRequest
+class CreateBacsStockRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
-
     public function authorize(): bool
     {
         return true;
@@ -21,14 +20,20 @@ class CreateRfidsStockRequest extends FormRequest
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
-
     public function rules(): array
     {
         return [
             'prefix' => ['required', 'string', 'min:1', 'regex:/^[A-Za-z0-9]+$/'],
-            'rfid_debut' => ['required', 'integer', 'min:1'],
-            'rfid_fin' => ['required', 'integer', 'min:1'],
+            'numero_debut' => ['required', 'integer', 'min:1'],
+            'numero_fin' => ['required', 'integer', 'min:1'],
+            'nature' => ['required', 'string', 'min:1'],
+            'capacite' => ['required', 'string', 'min:1'],
+            'matiere' => ['required', 'string', 'min:1'],
+            'color' => ['required', 'string', 'min:1'],
+            'cadre_commande' => ['required', 'string', 'min:1'],
             'quantite' => ['required', 'integer', 'min:1'],
+            'prix' => ['required', 'numeric', 'gt:0'],
+            'fournisseur' => ['required', 'string', 'min:1'],
             'commentaire' => ['sometimes', 'string'],
         ];
     }

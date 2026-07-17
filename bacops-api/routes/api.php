@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BacTypeController;
 use App\Http\Controllers\RfidController;
+use App\Http\Controllers\BacController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -25,4 +26,7 @@ Route::post('/bac-types/bac-types', [BacTypeController::class, 'store'])
     ->middleware(['auth:api', 'permission:stock:create']);
 
 Route::post('/stock/rfids', [RfidController::class, 'store'])
+    ->middleware(['auth:api', 'permission:stock:create']);
+
+Route::post('/stock/bacs', [BacController::class, 'store'])
     ->middleware(['auth:api', 'permission:stock:create']);
