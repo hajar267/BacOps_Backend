@@ -7,6 +7,7 @@ use App\Http\Controllers\BacTypeController;
 use App\Http\Controllers\RfidController;
 use App\Http\Controllers\BacController;
 use App\Http\Controllers\InstallController;
+use App\Http\Controllers\SearchController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -37,3 +38,9 @@ Route::post('/installations/BacRFID_avbl', [InstallController::class, 'checkAvai
 
 Route::post('/installations/install', [InstallController::class, 'store'])
     ->middleware(['auth:api', 'permission:install:create']);
+
+Route::middleware(['auth:api'])->group(function () {
+    Route::get('/search/bac/infos', [SearchController::class, 'infos']);
+    Route::get('/search/bac/{id}/history', [SearchController::class, 'history']);
+    Route::get('/search/bac/location', [SearchController::class, 'locations']);
+});

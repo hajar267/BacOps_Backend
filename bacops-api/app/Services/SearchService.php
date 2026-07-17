@@ -1,0 +1,131 @@
+<?php
+// app/Services/SearchService.php
+
+namespace App\Services;
+
+use App\Exceptions\SearchServiceException;
+use App\Models\Bac;
+use App\Models\BacHasRFID;
+use App\Models\Installation;
+
+class SearchService
+{
+    public function getBacInfoByRfid(string $rfid): ?array
+    {
+        $normalizedRfid = trim($rfid);
+
+        if ($normalizedRfid === '') {
+            throw new SearchServiceException('Le champ rfid ne doit pas être vide', 400);
+        }
+
+        $link = BacHasRFID::whereHas('rfid', function ($q) use ($normalizedRfid) {
+                $q->where('rfid_code', $normalizedRfid);
+            })
+            ->whereNull('unassigned_at')
+            ->orderByDesc('assigned_at')
+            ->with(['bac.bacType', 'rfid'])
+            ->first();
+
+        if (!$link) {
+            return null;
+        }
+
+        $bac = $link->bac;
+
+        // Ordering by a related table's column (session.installed_at) — Eloquent
+        // can't do this in a single orderBy() the way Prisma's nested orderBy does,
+        // so we fetch candidates and sort in PHP. Fine at this scale (one bac's
+        // installation history), but worth knowing if this table ever grows huge.
+        $currentInstallation = Installation::where('bac_id', $bac->id)
+            ->whereNull('uninstalled_at')
+            ->with('session')
+            ->get()
+            ->sortByDesc(fn ($i) => $i->session?->installed_at)
+            ->first();
+
+        return [
+            'id' => $bac->id,
+            'serialNumber' => $bac->serial_number,
+            'rfid' => $link->rfid->rfid_code,
+            'status' => $bac->status,
+            'bacType' => [
+                'nature' => $bac->bacType->nature,
+                'capacite' => $bac->bacType->capacite,
+                'matiere' => $bac->bacType->matiere,
+                'couleur' => $bac->bacType->color,
+                'variante' => $bac->bacType->variante,
+            ],
+            'currentInstallation' => $currentInstallation ? [
+                'address' => $currentInstallation->session->address,
+                'arrond' => $currentInstallation->session->arrond,
+                'locationLat' => $currentInstallation->location_lat,
+                'locationLng' => $currentInstallation->location_lng,
+                'installedAt' => $currentInstallation->session->installed_at->toIso8601String(),
+            ] : null,
+        ];
+    }
+
+    public function getBacHistoryById(int $id): array
+    {
+        if ($id < 1) {
+            throw new SearchServiceException("L'identifiant du bac doit être un entier positif", 400);
+        }
+
+        $bac = Bac::with(['addedByUser', 'installations.session.agent'])->find($id);
+
+        if (!$bac) {
+            throw new SearchServiceException('Bac introuvable', 404);
+        }
+
+        $events = [
+            [
+                'type' => 'stock',
+                'date' => $bac->created_at,
+                'address' => null,
+                'person' => $bac->addedByUser->username,
+            ],
+        ];
+
+        foreach ($bac->installations as $installation) {
+            $events[] = [
+                'type' => 'installation',
+                'date' => $installation->session->installed_at,
+                'address' => $installation->session->address,
+                'person' => $installation->session->agent->username,
+            ];
+        }
+
+        usort($events, fn ($a, $b) => $b['date']->timestamp <=> $a['date']->timestamp);
+
+        return array_map(fn ($event) => [
+            'type' => $event['type'],
+            'date' => $event['date']->toIso8601String(),
+            'address' => $event['address'],
+            'person' => $event['person'],
+        ], $events);
+    }
+
+    public function getBacLocations(): array
+    {
+        $installations = Installation::whereNull('uninstalled_at')
+            ->whereHas('bac', fn ($q) => $q->where('status', 'en_service'))
+            ->with(['bac.rfids' => function ($q) {
+                $q->whereNull('unassigned_at')->orderByDesc('assigned_at')->with('rfid');
+            }])
+            ->get();
+
+        return $installations->map(function ($installation) {
+            $bac = $installation->bac;
+            $rfidLink = $bac->rfids->first(); // already ordered desc per-parent by the eager-load constraint above
+
+            return [
+                'id' => $bac->id,
+                'serialNumber' => $bac->serial_number,
+                'rfid' => $rfidLink?->rfid?->rfid_code,
+                'locationLat' => $installation->location_lat,
+                'locationLng' => $installation->location_lng,
+                'status' => $bac->status,
+            ];
+        })->values()->all();
+    }
+}
