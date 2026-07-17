@@ -95,4 +95,43 @@ class RfidStockService
             throw new StockServiceException($message, 400);
         }
     }
+
+    public function findRfidsByTags(array $tags): \Illuminate\Support\Collection
+{
+    if (empty($tags)) {
+        return collect();
+    }
+
+    $rows = RFID::whereIn('rfid_code', $tags)
+        ->get(['id', 'rfid_code', 'status', 'commande_id', 'added_by']);
+
+    return $rows->keyBy('rfid_code');
+}
+
+public function isRfidAvailableForItem(?RFID $item): array
+{
+    if (!$item) {
+        return ['identifier' => '', 'available' => false, 'status' => 'not_found', 'reason' => 'not_found', 'item' => null];
+    }
+
+    $status = $item->status ?? 'not_found';
+    $available = $status === 'en_stock' || $status === 'disponible';
+    $reason = null;
+
+    if (!$available) {
+        $reason = match ($status) {
+            'en_service' => 'already_assigned',
+            'perdu' => 'perdu',
+            default => 'unavailable',
+        };
+    }
+
+    return [
+        'identifier' => $item->rfid_code,
+        'available' => $available,
+        'status' => $status,
+        'reason' => $reason,
+        'item' => $item,
+    ];
+}
 }

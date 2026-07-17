@@ -141,4 +141,81 @@ class BacStockService
             throw new StockServiceException($message, 400);
         }
     }
+
+    public function findBacTypeIdsBySiteInfo(array $siteInfo): array
+{
+    if (empty($siteInfo)) {
+        return [];
+    }
+
+    if (!empty($siteInfo['allowedBacTypeIds']) && is_array($siteInfo['allowedBacTypeIds'])) {
+        return $siteInfo['allowedBacTypeIds'];
+    }
+
+    $query = BacType::query();
+
+    if (!empty($siteInfo['nature'])) {
+        $query->where('nature', $siteInfo['nature']);
+    }
+    if (!empty($siteInfo['capacite'])) {
+        $query->where('capacite', $siteInfo['capacite']);
+    }
+    if (!empty($siteInfo['matiere'])) {
+        $query->where('matiere', $siteInfo['matiere']);
+    }
+    if (!empty($siteInfo['color'])) {
+        $query->where('color', $siteInfo['color']);
+    }
+    if (!empty($siteInfo['variante'])) {
+        $query->where('variante', $siteInfo['variante']);
+    }
+
+    return $query->pluck('id')->all();
+}
+
+public function findBacsBySerialsAndSite(array $serials, array $siteInfo): array
+{
+    $typeIds = $this->findBacTypeIdsBySiteInfo($siteInfo);
+
+    if (empty($typeIds)) {
+        return ['map' => collect(), 'typeIds' => $typeIds];
+    }
+
+    $bacs = Bac::whereIn('serial_number', $serials)
+        ->whereIn('bac_type_id', $typeIds)
+        ->get(['id', 'serial_number', 'status', 'bac_type_id', 'commande_id', 'added_by']);
+
+    $map = $bacs->keyBy('serial_number');
+
+    return ['map' => $map, 'typeIds' => $typeIds];
+}
+
+public function isBacAvailableForItem(?Bac $item): array
+{
+    if (!$item) {
+        return ['identifier' => '', 'available' => false, 'status' => 'not_found', 'reason' => 'not_found', 'item' => null];
+    }
+
+    $status = $item->status ?? 'not_found';
+    $available = $status === 'en_stock';
+    $reason = null;
+
+    if (!$available) {
+        $reason = match ($status) {
+            'en_service' => 'already_installed',
+            'en_reparation' => 'in_repair',
+            'perdu' => 'perdu',
+            'mis_en_rebut' => 'mis_en_rebut',
+            default => 'unavailable',
+        };
+    }
+
+    return [
+        'identifier' => $item->serial_number,
+        'available' => $available,
+        'status' => $status,
+        'reason' => $reason,
+        'item' => $item,
+    ];
+}
 }

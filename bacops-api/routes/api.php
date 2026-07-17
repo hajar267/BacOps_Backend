@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BacTypeController;
 use App\Http\Controllers\RfidController;
 use App\Http\Controllers\BacController;
+use App\Http\Controllers\InstallController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -30,3 +31,9 @@ Route::post('/stock/rfids', [RfidController::class, 'store'])
 
 Route::post('/stock/bacs', [BacController::class, 'store'])
     ->middleware(['auth:api', 'permission:stock:create']);
+
+Route::post('/installations/BacRFID_avbl', [InstallController::class, 'checkAvailability'])
+    ->middleware(['auth:api', 'permission:install:read']);
+
+Route::post('/installations/install', [InstallController::class, 'store'])
+    ->middleware(['auth:api', 'permission:install:create']);
