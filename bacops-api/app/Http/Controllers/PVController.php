@@ -8,6 +8,7 @@ use App\Http\Requests\PreviewPvRequest;
 use App\Http\Requests\UploadSignedPvRequest;
 use App\Services\PVService;
 use Illuminate\Http\JsonResponse;
+use App\Http\Resources\PVResource;
 
 class PVController extends Controller
 {
@@ -18,8 +19,9 @@ class PVController extends Controller
     public function index(): JsonResponse
     {
         try {
-            return response()->json($this->service->getAllPVs(), 200);
+            return response()->json(PVResource::collection($this->service->getAllPVs()), 200);
         } catch (\Exception $e) {
+            \Log::error('PV fetch failed: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json(['error' => 'Internal Server Error', 'message' => 'Failed to fetch PVs'], 500);
         }
     }
@@ -39,8 +41,9 @@ class PVController extends Controller
                 'fileBuffer' => file_get_contents($file->getRealPath()),
             ]);
 
-            return response()->json($pv, 201);
+            return response()->json(new PVResource($pv), 201);
         } catch (\Exception $e) {
+            \Log::error('PV creation failed: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json(['error' => 'Internal Server Error', 'message' => 'Failed to create PV'], 500);
         }
     }
@@ -63,8 +66,9 @@ class PVController extends Controller
 
             $pv = $this->service->uploadSignedPv($pvId, file_get_contents($file->getRealPath()));
 
-            return response()->json($pv, 200);
+            return response()->json(new PVResource($pv), 200);
         } catch (\Exception $e) {
+            \Log::error('Signed PV upload failed: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json(['error' => 'Internal Server Error', 'message' => 'Failed to upload signed PV'], 500);
         }
     }
