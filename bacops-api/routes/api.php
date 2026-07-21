@@ -9,6 +9,8 @@ use App\Http\Controllers\BacController;
 use App\Http\Controllers\InstallController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\PVController;
+use App\Http\Controllers\DashboardController;
+
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -56,3 +58,10 @@ Route::post('/pv/download', [PVController::class, 'store'])
 
 Route::post('/pv/{id}/signed', [PVController::class, 'uploadSigned'])
     ->middleware(['auth:api', 'permission:admin:create']);
+
+Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
+    Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+    Route::get('/dashboard/installations', [DashboardController::class, 'installations']);
+    Route::get('/dashboard/bacs-per-type', [DashboardController::class, 'bacsPerType']);
+    Route::get('/dashboard/bac-value', [DashboardController::class, 'bacValue']);
+});
