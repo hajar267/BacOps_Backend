@@ -20,7 +20,7 @@ export default function LoginPage() {
     if (!username.trim() || !password) return;
     try {
       await login(username.trim(), password);
-      router.push('/dashboard');
+      router.push('/app/dashboard');
     } catch {
       // error already set in the store
     }
