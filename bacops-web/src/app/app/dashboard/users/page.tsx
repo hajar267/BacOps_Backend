@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import { UserPlus, Pencil, Trash2 } from 'lucide-react';
 import { userService } from '@/services/userService';
 import { UserListItem } from '@/types/user';
+import { CreateUserModal } from '@/components/users/CreateUserModal';
+import { DeleteUserModal } from '@/components/users/DeleteUserModal';
+import { EditUserModal } from '@/components/users/EditUserModal';
 
 const ROLE_BADGE_STYLES: Record<string, string> = {
   admin: 'bg-brand-primary/15 text-text-primary',
@@ -14,6 +17,10 @@ const ROLE_BADGE_STYLES: Record<string, string> = {
 export default function UsersPage() {
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<UserListItem | null>(null);
+  const [userToEdit, setUserToEdit] =
+  useState<UserListItem | null>(null);
 
   useEffect(() => {
     userService.list().then((data) => {
@@ -21,6 +28,22 @@ export default function UsersPage() {
       setIsLoading(false);
     });
   }, []);
+
+  const handleUserCreated = (newUser: UserListItem) => {
+    setUsers((prev) => [...prev, newUser]);
+  };
+
+  const handleUserDeleted = (id: number) => {
+  setUsers((prev) => prev.filter((u) => u.id !== id));
+};
+
+const handleUserUpdated = (updatedUser: UserListItem) => {
+  setUsers((prev) =>
+    prev.map((user) =>
+      user.id === updatedUser.id ? updatedUser : user
+    )
+  );
+};
 
   return (
     <div className="p-8">
@@ -31,9 +54,7 @@ export default function UsersPage() {
           <p className="text-sm text-text-secondary mt-1">Gérer les utilisateurs du système</p>
         </div>
         <button
-          onClick={() => {
-            /* TODO: open create-user modal/page */
-          }}
+          onClick={() => setIsModalOpen(true)}
           className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-white bg-brand-primary hover:bg-brand-primary/90 active:scale-[0.98] transition-all"
         >
           <UserPlus className="w-4 h-4" />
@@ -91,6 +112,7 @@ export default function UsersPage() {
                     <button
                       onClick={() => {
                         /* TODO: open edit-user modal/page */
+                        setUserToEdit(user)
                       }}
                       className="text-text-secondary hover:text-text-primary transition-colors"
                       aria-label="Modifier"
@@ -99,6 +121,7 @@ export default function UsersPage() {
                     </button>
                     <button
                       onClick={() => {
+                        setUserToDelete(user)
                         /* TODO: confirm + delete user */
                       }}
                       className="text-brand-error hover:text-brand-error/80 transition-colors"
@@ -113,6 +136,29 @@ export default function UsersPage() {
           </tbody>
         </table>
       </div>
+
+      {isModalOpen && (
+        <CreateUserModal
+          onClose={() => setIsModalOpen(false)}
+          onCreated={handleUserCreated}
+        />
+      )}
+
+      {userToDelete && (
+        <DeleteUserModal
+          user={userToDelete}
+          onClose={() => setUserToDelete(null)}
+          onDeleted={handleUserDeleted}
+        />
+      )}
+
+      {userToEdit && (
+  <EditUserModal
+    user={userToEdit}
+    onClose={() => setUserToEdit(null)}
+    onUpdated={handleUserUpdated}
+  />
+)}
     </div>
   );
 }
