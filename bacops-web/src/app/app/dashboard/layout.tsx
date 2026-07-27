@@ -1,14 +1,14 @@
 'use client';
 
 import { Sidebar } from '@/components/dashboard/Sidebar';
-import { useAuthStore } from '@/stores/authStore';
+import { useRequireAuth } from '@/hooks/useAuth';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAuthenticated = useRequireAuth();
 
   if (!isAuthenticated) return null;
 

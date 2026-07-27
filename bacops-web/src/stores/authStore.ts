@@ -17,6 +17,8 @@ interface AuthState {
   logout: () => void;
   refreshAccessToken: () => Promise<void>;
   clearError: () => void;
+    hasHydrated: boolean;
+  setHasHydrated: (value: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -28,6 +30,10 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
+      hasHydrated: false,
+      setHasHydrated: (value) => set({ hasHydrated: value }),
+
+      
 
 login: async (username, password) => {
   set({ isLoading: true, error: null });
@@ -62,7 +68,7 @@ login: async (username, password) => {
         const refreshToken = get().refreshToken;
         if (!refreshToken) throw new Error('No refresh token');
         const data = await authService.refresh(refreshToken);
-        set({ accessToken: data.access_token });
+        set({ accessToken: data.accessToken });
       },
 
       clearError: () => set({ error: null }),
@@ -76,6 +82,9 @@ login: async (username, password) => {
         refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
       }),
+        onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

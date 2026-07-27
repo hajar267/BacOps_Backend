@@ -7,11 +7,10 @@ export const authService = {
     return data;
   },
 
-  refresh: async (refreshToken: string): Promise<{ access_token: string }> => {
-    const { data } = await api.post('/auth/refresh', { refresh_token: refreshToken });
-    return data;
-  },
-
+refresh: async (refreshToken: string): Promise<{ accessToken: string }> => {
+  const { data } = await api.post('/auth/refresh', { refresh_token: refreshToken });
+  return data;
+},
 //   logout: async (): Promise<void> => {
 //     await api.post('/auth/logout');
 //   },

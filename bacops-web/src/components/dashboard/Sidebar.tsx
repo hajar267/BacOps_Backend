@@ -42,7 +42,7 @@ export function Sidebar() {
   return (
     <aside className="w-64 h-screen flex flex-col bg-white border-r border-surface-border">
       {/* User block */}
-      <div className="p-5 border-b border-surface-border bg-brand-primary/[0.06]">
+      <div className="p-5 border-b border-surface-border bg-brand-primary/6">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-full bg-brand-primary/15 border border-brand-primary/20 flex items-center justify-center shrink-0">
             <span className="text-sm font-bold text-text-primary tracking-wide">
@@ -76,7 +76,7 @@ export function Sidebar() {
                     : 'text-text-secondary hover:bg-surface-bg'
                 }`}
               >
-                <Icon className="w-[18px] h-[18px]" />
+                <Icon className="w-4.5 h-4.5" />
                 {entry.label}
               </Link>
             );
@@ -91,7 +91,7 @@ export function Sidebar() {
                 onClick={() => setExpanded(isOpen ? null : entry.label)}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-text-secondary hover:bg-surface-bg transition-colors"
               >
-                <GroupIcon className="w-[18px] h-[18px]" />
+                <GroupIcon className="w-4.5 h-4.5" />
                 <span className="flex-1 text-left">{entry.label}</span>
                 {isOpen ? (
                   <ChevronDown className="w-4 h-4" />
@@ -133,7 +133,7 @@ export function Sidebar() {
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-text-primary hover:bg-surface-bg transition-colors"
         >
-          <LogOut className="w-[18px] h-[18px]" />
+          <LogOut className="w-4.5 h-4.5" />
           Déconnexion
         </button>
       </div>

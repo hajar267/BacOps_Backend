@@ -24,8 +24,8 @@ export const NAV_ITEMS: Record<string, NavEntry[]> = {
       label: 'Configuration',
       icon: 'settings',
       items: [
-        { label: 'Types de bac', href: '/dashboard/types', icon: 'box' },
-        { label: 'Procès-Verbaux', href: '/dashboard/pv', icon: 'file' },
+        { label: 'Types de bac', href: '/app/dashboard/types', icon: 'box' },
+        { label: 'Procès-Verbaux', href: '/app/dashboard/pv', icon: 'file' },
       ],
     },
     {
@@ -33,7 +33,7 @@ export const NAV_ITEMS: Record<string, NavEntry[]> = {
       label: 'Utilisateurs',
       icon: 'users',
       items: [
-        { label: 'Gestion des utilisateurs', href: '/dashboard/users', icon: 'users' },
+        { label: 'Gestion des utilisateurs', href: '/app/dashboard/users', icon: 'users' },
       ],
     },
     {
@@ -41,7 +41,7 @@ export const NAV_ITEMS: Record<string, NavEntry[]> = {
       label: 'Mon compte',
       icon: 'user',
       items: [
-        { label: 'Changer mot de passe', href: '/dashboard/account/password', icon: 'lock' },
+        { label: 'Changer mot de passe', href: '/app/dashboard/account/password', icon: 'lock' },
       ],
     },
   ],
@@ -51,7 +51,7 @@ export const NAV_ITEMS: Record<string, NavEntry[]> = {
       label: 'Mon compte',
       icon: 'user',
       items: [
-        { label: 'Changer mot de passe', href: '/dashboard/account/password', icon: 'lock' },
+        { label: 'Changer mot de passe', href: '/app/dashboard/account/password', icon: 'lock' },
       ],
     },
   ],
@@ -61,7 +61,7 @@ export const NAV_ITEMS: Record<string, NavEntry[]> = {
       label: 'Mon compte',
       icon: 'user',
       items: [
-        { label: 'Changer mot de passe', href: '/dashboard/account/password', icon: 'lock' },
+        { label: 'Changer mot de passe', href: '/app/dashboard/account/password', icon: 'lock' },
       ],
     },
   ],

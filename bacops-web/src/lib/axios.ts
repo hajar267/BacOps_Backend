@@ -1,5 +1,5 @@
 import axios from 'axios';
-// import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/authStore';
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL, // e.g. http://localhost:8000/api
@@ -8,10 +8,10 @@ export const api = axios.create({
 
 // Attach access token on every request
 api.interceptors.request.use((config) => {
-  // const token = useAuthStore.getState().accessToken;
-  // if (token) {
-  //   config.headers.Authorization = `Bearer ${token}`;
-  // }
+  const token = useAuthStore.getState().accessToken;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
 
