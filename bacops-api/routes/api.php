@@ -10,6 +10,7 @@ use App\Http\Controllers\InstallController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\PVController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
 
 
 // Route::get('/user', function (Request $request) {
@@ -64,4 +65,13 @@ Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
     Route::get('/dashboard/installations', [DashboardController::class, 'installations']);
     Route::get('/dashboard/bacs-per-type', [DashboardController::class, 'bacsPerType']);
     Route::get('/dashboard/bac-value', [DashboardController::class, 'bacValue']);
+    Route::get('/users', [UserController::class, 'index']);
 });
+
+//////////testing stuff
+// Route::get('/hello', function () {
+//     return response()->json([
+//         'message' => 'Hello from Laravel'
+//     ]);
+// });    
+//////////

@@ -17,6 +17,7 @@ class User extends Authenticatable implements JWTSubject
 
     protected $casts = [
         'is_active' => 'boolean',
+        'created_at' => 'datetime',
     ];
 
     public $timestamps = false; // matches your schema — no updated_at on users
