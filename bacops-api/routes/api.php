@@ -1,17 +1,16 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BacController;
+use App\Http\Controllers\BacTypeController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InstallController;
+use App\Http\Controllers\PVController;
+use App\Http\Controllers\RfidController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BacTypeController;
-use App\Http\Controllers\RfidController;
-use App\Http\Controllers\BacController;
-use App\Http\Controllers\InstallController;
-use App\Http\Controllers\SearchController;
-use App\Http\Controllers\PVController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\UserController;
-
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -68,10 +67,17 @@ Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
     Route::get('/users', [UserController::class, 'index']);
 });
 
-//////////testing stuff
+Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
+    Route::put('/users/{user}', [UserController::class, 'update']);
+});
+
+Route::post('/users', [UserController::class, 'store'])
+    ->middleware(['auth:api', 'permission:admin:create']);
+
+// ////////testing stuff
 // Route::get('/hello', function () {
 //     return response()->json([
 //         'message' => 'Hello from Laravel'
 //     ]);
-// });    
-//////////
+// });
+// ////////
