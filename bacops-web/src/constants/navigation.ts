@@ -33,7 +33,7 @@ export const NAV_ITEMS: Record<string, NavEntry[]> = {
       icon: 'users',
       items: [
         { label: 'Gestion des utilisateurs', href: '/app/dashboard/users', icon: 'users' },
-        { label: 'permissions', href: '/app/dashboard/permission', icon: 'Shield' },
+        { label: 'permissions', href: '/app/dashboard/roles', icon: 'Shield' },
       ],
     },
     {
