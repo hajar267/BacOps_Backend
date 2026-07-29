@@ -1,4 +1,4 @@
-import { UserListItem, CreateUserPayload, RoleOption, UpdateUserPayload} from '@/types/user';
+import { UserListItem, CreateUserPayload, RoleOption, UpdateUserPayload, UpdatePasswordPayload} from '@/types/user';
 import { api } from '@/lib/axios';
 
 export const userService = {
@@ -15,17 +15,17 @@ export const userService = {
 
     create: async (payload: CreateUserPayload): Promise<UserListItem> => {
     // TODO: replace with real API call
-    // const { data } = await api.post('/users', payload);
-    // return data;
-    return {
-      id: Math.floor(Math.random() * 10000),
-      username: payload.email.split('@')[0],
-      role: { name: payload.roleName, permissions: [] },
-        firstName: payload.firstName,
-        lastName: payload.lastName,
-        email: payload.email,
-        active: true,
-    };
+    const { data } = await api.post('/users', payload);
+    return data;
+    // return {
+    //   id: Math.floor(Math.random() * 10000),
+    //   username: payload.email.split('@')[0],
+    //   role: { name: payload.roleName, permissions: [] },
+    //     firstName: payload.firstName,
+    //     lastName: payload.lastName,
+    //     email: payload.email,
+    //     active: true,
+    // };
   },
 
   listRoles: async (): Promise<RoleOption[]> => {
@@ -39,9 +39,9 @@ export const userService = {
 
   delete: async (id: number): Promise<void> => {
   // TODO: replace with real API call
-  // await api.delete(`/users/${id}`);
-console.log(`Deleting user with id: ${id}`);
-  await new Promise((resolve) => setTimeout(resolve, 700));
+  await api.delete(`/users/${id}`);
+// console.log(`Deleting user with id: ${id}`);
+//   await new Promise((resolve) => setTimeout(resolve, 700));
 
   // Uncomment to test the error UI
   // throw new Error('Delete failed');
@@ -53,23 +53,34 @@ update: async (
 ): Promise<UserListItem> => {
 
   // TODO replace with API
-  // const { data } = await api.patch(`/users/${id}`, payload);
-  // return data;
+  const { data } = await api.put(`/users/${id}`, payload);
+  return data;
 
-  await new Promise(resolve => setTimeout(resolve, 700));
+  // await new Promise(resolve => setTimeout(resolve, 700));
 
-  return {
-    id,
-    username: payload.email.split("@")[0],
-    firstName: payload.firstName,
-    lastName: payload.lastName,
-    email: payload.email,
-    active: payload.active,
-    role: {
-      name: payload.roleName,
-      permissions: [],
-    },
-  };
+  // return {
+  //   id,
+  //   username: payload.email.split("@")[0],
+  //   firstName: payload.firstName,
+  //   lastName: payload.lastName,
+  //   email: payload.email,
+  //   active: payload.active,
+  //   role: {
+  //     name: payload.roleName,
+  //     permissions: [],
+  //   },
+  // };
+},
+
+updatePassword: async (
+  id: number,
+  payload: UpdatePasswordPayload
+): Promise<void> => {
+  // TODO: replace with real API call if your backend uses a different endpoint
+  await api.patch(`/users/${id}/password`, payload);
+  // console.log(`Updating password for user with id: ${id}`, payload);
+
+  // await new Promise((resolve) => setTimeout(resolve, 700));
 },
 
 };

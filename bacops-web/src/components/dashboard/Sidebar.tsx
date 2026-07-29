@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LogOut, LayoutDashboard, FileText, Users, Box, Tag,
-  ListChecks, Settings, User, Lock, ChevronDown, ChevronRight,
+  ListChecks, Settings, User, Lock, ChevronDown, ChevronRight, Shield, MapPinned
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getInitials } from '@/utils/initials';
@@ -21,6 +21,8 @@ const ICONS: Record<string, React.ElementType> = {
   settings: Settings,
   user: User,
   lock: Lock,
+  Shield: Shield,
+  map: MapPinned,
 };
 
 export function Sidebar() {
@@ -36,7 +38,7 @@ export function Sidebar() {
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push('/app/auth/login');
   };
 
   return (

@@ -21,11 +21,10 @@ export const NAV_ITEMS: Record<string, NavEntry[]> = {
   admin: [
     {
       type: 'group',
-      label: 'Configuration',
-      icon: 'settings',
+      label: 'Mon compte',
+      icon: 'user',
       items: [
-        { label: 'Types de bac', href: '/app/dashboard/types', icon: 'box' },
-        { label: 'Procès-Verbaux', href: '/app/dashboard/pv', icon: 'file' },
+        { label: 'Changer mot de passe', href: '/app/dashboard/account/password', icon: 'lock' },
       ],
     },
     {
@@ -34,14 +33,17 @@ export const NAV_ITEMS: Record<string, NavEntry[]> = {
       icon: 'users',
       items: [
         { label: 'Gestion des utilisateurs', href: '/app/dashboard/users', icon: 'users' },
+        { label: 'permissions', href: '/app/dashboard/permission', icon: 'Shield' },
       ],
     },
     {
       type: 'group',
-      label: 'Mon compte',
-      icon: 'user',
+      label: 'Configuration',
+      icon: 'settings',
       items: [
-        { label: 'Changer mot de passe', href: '/app/dashboard/account/password', icon: 'lock' },
+        { label: 'Types de bac', href: '/app/dashboard/types', icon: 'box' },
+        { label: 'Procès-Verbaux', href: '/app/dashboard/pv', icon: 'file' },
+        { label: 'Gestion des arronds', href: '/app/dashboard/arrond', icon: 'map' },
       ],
     },
   ],

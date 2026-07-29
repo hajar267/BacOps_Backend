@@ -7,6 +7,8 @@ import { UserListItem } from '@/types/user';
 import { CreateUserModal } from '@/components/users/CreateUserModal';
 import { DeleteUserModal } from '@/components/users/DeleteUserModal';
 import { EditUserModal } from '@/components/users/EditUserModal';
+import { Key } from 'lucide-react'; // add to your lucide import
+import { UpdatePasswordModal } from '@/components/users/UpdatePasswordModal';
 
 const ROLE_BADGE_STYLES: Record<string, string> = {
   admin: 'bg-brand-primary/15 text-text-primary',
@@ -20,6 +22,8 @@ export default function UsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<UserListItem | null>(null);
   const [userToEdit, setUserToEdit] =
+  useState<UserListItem | null>(null);
+  const [userToUpdatePassword, setUserToUpdatePassword] =
   useState<UserListItem | null>(null);
 
   useEffect(() => {
@@ -119,6 +123,15 @@ const handleUserUpdated = (updatedUser: UserListItem) => {
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
+                    <div className="flex items-center justify-end gap-3">
+                      <button
+                        onClick={() => setUserToUpdatePassword(user)}
+                        className="text-text-secondary hover:text-brand-primary transition-colors"
+                        aria-label="Modifier le mot de passe"
+                      >
+                        <Key className="w-4 h-4" />
+                      </button>
+                    </div>
                     <button
                       onClick={() => {
                         setUserToDelete(user)
@@ -157,6 +170,16 @@ const handleUserUpdated = (updatedUser: UserListItem) => {
     user={userToEdit}
     onClose={() => setUserToEdit(null)}
     onUpdated={handleUserUpdated}
+  />
+)}
+
+{userToUpdatePassword && (
+  <UpdatePasswordModal
+    user={userToUpdatePassword}
+    onClose={() => setUserToUpdatePassword(null)}
+    onUpdated={() => {
+      // optional: toast/success feedback here
+    }}
   />
 )}
     </div>

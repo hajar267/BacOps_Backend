@@ -38,3 +38,8 @@ export interface EditUserModalProps {
 
     onUpdated: (user: UserListItem) => void;
 }
+
+export interface UpdatePasswordPayload {
+  password: string;
+  passwordConfirmation: string;
+}
