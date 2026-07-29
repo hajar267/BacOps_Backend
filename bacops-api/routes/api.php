@@ -69,6 +69,7 @@ Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
 
 Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
     Route::put('/users/{user}', [UserController::class, 'update']);
+    Route::delete('/users/{user}', [UserController::class, 'destroy']);
 });
 
 Route::post('/users', [UserController::class, 'store'])

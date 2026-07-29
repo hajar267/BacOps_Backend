@@ -44,6 +44,27 @@ class UserController extends Controller
         }
     }
 
+    public function destroy($id): JsonResponse
+    {
+        try {
+            $this->service->deleteUser($id);
+
+            return response()->json(['message' => 'User deleted successfully'], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Not Found',
+                'message' => 'User not found',
+            ], 404);
+        } catch (\Exception $e) {
+            \Log::error('Deleting user failed: '.$e->getMessage(), ['exception' => $e]);
+
+            return response()->json([
+                'error' => 'Internal Server Error',
+                'message' => 'Failed to delete user',
+            ], 500);
+        }
+    }
+
     public function update(UpdateUserRequest $request, $id): JsonResponse
     {
         try {

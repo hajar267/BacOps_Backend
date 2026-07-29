@@ -71,4 +71,12 @@ class UserService
 
         return $user->load('role');
     }
+
+    public function deleteUser(int $id): User
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return $user->load('role');
+    }
 }
