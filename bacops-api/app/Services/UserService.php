@@ -72,6 +72,14 @@ class UserService
         return $user->load('role');
     }
 
+    public function updatePassword(int $id, string $password): User
+    {
+        $user = User::findOrFail($id);
+        $user->update(['password' => Hash::make($password)]);
+
+        return $user->load('role');
+    }
+
     public function deleteUser(int $id): User
     {
         $user = User::findOrFail($id);

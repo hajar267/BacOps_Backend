@@ -5,6 +5,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Services\UserService;
@@ -40,6 +41,27 @@ class UserController extends Controller
             return response()->json([
                 'error' => 'Internal Server Error',
                 'message' => 'Failed to create user',
+            ], 500);
+        }
+    }
+
+    public function updatePassword(UpdatePasswordRequest $request, $id): JsonResponse
+    {
+        try {
+            $user = $this->service->updatePassword($id, $request->validated('password'));
+
+            return response()->json(new UserResource($user), 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Not Found',
+                'message' => 'User not found',
+            ], 404);
+        } catch (\Exception $e) {
+            \Log::error('Updating password failed: '.$e->getMessage(), ['exception' => $e]);
+
+            return response()->json([
+                'error' => 'Internal Server Error',
+                'message' => 'Failed to update password',
             ], 500);
         }
     }
