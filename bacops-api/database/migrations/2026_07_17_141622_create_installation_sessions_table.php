@@ -18,7 +18,7 @@ return new class extends Migration
             $table->double('location_lat')->nullable();
             $table->double('location_lng')->nullable();
             $table->string('address')->nullable();
-            $table->string('arrond')->nullable();
+            $table->foreignId('arrondissement_id')->nullable()->constrained();
             $table->timestamp('installed_at');
         });
     }

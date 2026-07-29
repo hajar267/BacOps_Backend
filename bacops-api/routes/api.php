@@ -11,6 +11,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LocationController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -75,6 +76,19 @@ Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
 
 Route::post('/users', [UserController::class, 'store'])
     ->middleware(['auth:api', 'permission:admin:create']);
+
+Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
+    Route::get('/locations/tree', [LocationController::class, 'tree']);
+});
+
+Route::middleware(['auth:api', 'permission:admin:create'])->group(function () {
+    Route::post('/arrondissements', [LocationController::class, 'store']);
+});
+
+Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
+    Route::put('/arrondissements/{id}', [LocationController::class, 'update']);
+    Route::delete('/arrondissements/{id}', [LocationController::class, 'destroy']);
+});
 
 // ////////testing stuff
 // Route::get('/hello', function () {
