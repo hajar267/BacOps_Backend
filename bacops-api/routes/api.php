@@ -12,6 +12,8 @@ use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -88,6 +90,19 @@ Route::middleware(['auth:api', 'permission:admin:create'])->group(function () {
 Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
     Route::put('/arrondissements/{id}', [LocationController::class, 'update']);
     Route::delete('/arrondissements/{id}', [LocationController::class, 'destroy']);
+});
+
+Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
+    Route::get('/permissions', [PermissionController::class, 'index']);
+    Route::get('/roles', [RoleController::class, 'index']);
+});
+
+Route::middleware(['auth:api', 'permission:admin:create'])
+    ->post('/roles', [RoleController::class, 'store']);
+
+Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
+    Route::put('/roles/{role}', [RoleController::class, 'update']);
+    Route::delete('/roles/{role}', [RoleController::class, 'destroy']);
 });
 
 // ////////testing stuff
