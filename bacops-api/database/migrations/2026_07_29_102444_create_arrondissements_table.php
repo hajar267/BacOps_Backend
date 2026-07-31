@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('arrondissements', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('prefecture_ville_id')->constrained()->cascadeOnDelete();
-            $table->string('name');
-            $table->timestamps();
+Schema::table('arrondissements', function (Blueprint $table) {
+    $table->dropForeign(['prefecture_ville_id']);
+    $table->dropColumn('prefecture_ville_id');
 
-            $table->unique(['prefecture_ville_id', 'name']);
-        });    
-    }
+    $table->foreignId('ville_id')->after('id')->constrained()->cascadeOnDelete();
+    $table->foreignId('prefecture_id')->nullable()->after('ville_id')->constrained()->nullOnDelete();
+});    }
 
     /**
      * Reverse the migrations.

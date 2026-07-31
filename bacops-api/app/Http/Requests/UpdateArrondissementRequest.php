@@ -14,9 +14,9 @@ class UpdateArrondissementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'prefecture' => 'sometimes|required|string|max:255',
-            'ville' => 'sometimes|required|string|max:255',
-            'name' => 'sometimes|required|string|max:255',
+            'ville_id' => ['required', 'exists:villes,id'],
+            'prefecture_id' => ['nullable', 'exists:prefectures,id'],
+            'name' => ['required', 'string', 'max:255'],
         ];
     }
 }

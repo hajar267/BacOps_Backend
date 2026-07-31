@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreArrondissementRequest extends FormRequest
+class StorePrefectureRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -15,7 +16,6 @@ class StoreArrondissementRequest extends FormRequest
     {
         return [
             'ville_id' => ['required', 'exists:villes,id'],
-            'prefecture_id' => ['nullable', 'exists:prefectures,id'],
             'name' => ['required', 'string', 'max:255'],
         ];
     }

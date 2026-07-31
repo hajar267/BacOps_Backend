@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\VilleController;
+use App\Http\Controllers\PrefectureController;
+use App\Http\Controllers\ArrondissementController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -79,18 +82,41 @@ Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
 Route::post('/users', [UserController::class, 'store'])
     ->middleware(['auth:api', 'permission:admin:create']);
 
+// Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
+//     Route::get('/locations/tree', [LocationController::class, 'tree']);
+// });
+
+// Route::middleware(['auth:api', 'permission:admin:create'])->group(function () {
+//     Route::post('/arrondissements', [LocationController::class, 'store']);
+// });
+
+// Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
+//     Route::put('/arrondissements/{id}', [LocationController::class, 'update']);
+//     Route::delete('/arrondissements/{id}', [LocationController::class, 'destroy']);
+// });
+
+//////////////////
 Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
-    Route::get('/locations/tree', [LocationController::class, 'tree']);
+    Route::get('/villes', [VilleController::class, 'index']);
+    Route::get('/prefectures', [PrefectureController::class, 'index']);
+    Route::get('/arrondissements', [ArrondissementController::class, 'index']);
 });
 
 Route::middleware(['auth:api', 'permission:admin:create'])->group(function () {
-    Route::post('/arrondissements', [LocationController::class, 'store']);
+    Route::post('/villes', [VilleController::class, 'store']);
+    Route::post('/prefectures', [PrefectureController::class, 'store']);
+    Route::post('/arrondissements', [ArrondissementController::class, 'store']);
 });
 
 Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
-    Route::put('/arrondissements/{id}', [LocationController::class, 'update']);
-    Route::delete('/arrondissements/{id}', [LocationController::class, 'destroy']);
+    Route::put('/villes/{ville}', [VilleController::class, 'update']);
+    Route::delete('/villes/{ville}', [VilleController::class, 'destroy']);
+    Route::put('/prefectures/{prefecture}', [PrefectureController::class, 'update']);
+    Route::delete('/prefectures/{prefecture}', [PrefectureController::class, 'destroy']);
+    Route::put('/arrondissements/{arrondissement}', [ArrondissementController::class, 'update']);
+    Route::delete('/arrondissements/{arrondissement}', [ArrondissementController::class, 'destroy']);
 });
+//////////////////
 
 Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
     Route::get('/permissions', [PermissionController::class, 'index']);
