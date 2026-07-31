@@ -106,12 +106,12 @@ export function LocationFormModal({
               type="text"
               value={prefecture}
               onChange={(e) => setPrefecture(e.target.value)}
-              placeholder="ex. Anfa — laisser vide si la ville n'est pas divisée"
+              placeholder="ex. Anfa"
               className="w-full px-3.5 py-2.5 rounded-lg border border-surface-border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
             />
-            <p className="text-xs text-text-secondary mt-1">
+            {/* <p className="text-xs text-text-secondary mt-1">
               À renseigner uniquement pour les villes découpées en plusieurs préfectures (Casablanca, Rabat...).
-            </p>
+            </p> */}
           </div>
 
           <div>
@@ -122,7 +122,7 @@ export function LocationFormModal({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="ex. Sidi Belyout"
+              placeholder="ex. Anfa"
               className="w-full px-3.5 py-2.5 rounded-lg border border-surface-border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
             />
           </div>

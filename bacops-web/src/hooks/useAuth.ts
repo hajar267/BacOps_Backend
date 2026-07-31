@@ -11,7 +11,8 @@ export function useRequireAuth() {
 
   useEffect(() => {
     if (hasHydrated && !isAuthenticated) {
-      router.replace('/login');
+
+      router.replace('/app/auth/login');
     }
   }, [hasHydrated, isAuthenticated, router]);
 
