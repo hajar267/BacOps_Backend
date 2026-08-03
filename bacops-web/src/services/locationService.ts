@@ -1,77 +1,52 @@
 import { api } from '@/lib/axios';
-import {
-  ArrondissementListItem,
-  PrefectureVilleTreeNode,
-  CreateArrondissementPayload,
-  UpdateArrondissementPayload,
-} from '@/types/location';
-
-interface RawArrondissementResponse {
-  id: number;
-  prefecture_ville_id: number;
-  name: string;
-  prefecture_ville: {
-    id: number;
-    prefecture: string | null;
-    ville: string;
-  };
-}
-
-function normalizeArrondissement(
-  raw: RawArrondissementResponse
-): ArrondissementListItem {
-  return {
-    id: raw.id,
-    name: raw.name,
-    prefectureVille: {
-      id: raw.prefecture_ville.id,
-      prefecture: raw.prefecture_ville.prefecture,
-      ville: raw.prefecture_ville.ville,
-    },
-  };
-}
-
-function flattenTree(
-  tree: PrefectureVilleTreeNode[]
-): ArrondissementListItem[] {
-  return tree.flatMap((pv) =>
-    pv.arrondissements.map((a) => ({
-      id: a.id,
-      name: a.name,
-      prefectureVille: {
-        id: pv.id,
-        prefecture: pv.prefecture,
-        ville: pv.ville,
-      },
-    }))
-  );
-}
+import { ArrondissementListItem, CreateArrondissementPayload, UpdateArrondissementPayload } from '@/types/location';
 
 export const locationService = {
   list: async (): Promise<ArrondissementListItem[]> => {
-    const { data } = await api.get<PrefectureVilleTreeNode[]>('/locations/tree');
-    return flattenTree(data);
+    const { data } = await api.get('/arrondissements');
+    const items = data.data || data;
+    return items.map((raw: any) => ({
+      id: raw.id,
+      name: raw.name,
+      prefectureVille: {
+        id: raw.ville?.id ?? 0,
+        prefecture: raw.prefecture?.name ?? null,
+        ville: raw.ville?.name ?? '',
+      },
+    }));
   },
 
   create: async (
     payload: CreateArrondissementPayload
   ): Promise<ArrondissementListItem> => {
-    const { data } = await api.post<RawArrondissementResponse>(
-      '/arrondissements',
-      payload
-    );
-    return normalizeArrondissement(data);
+    const { data } = await api.post('/arrondissements', payload);
+    const raw = data.data || data;
+    return {
+      id: raw.id,
+      name: raw.name,
+      prefectureVille: {
+        id: raw.ville?.id ?? 0,
+        prefecture: raw.prefecture?.name ?? null,
+        ville: raw.ville?.name ?? '',
+      },
+    };
   },
 
   update: async (
     id: number,
     payload: UpdateArrondissementPayload
   ): Promise<ArrondissementListItem> => {
-    const { data } = await api.put<RawArrondissementResponse>(
-      `/arrondissements/${id}`,
-      payload
-    );
-    return normalizeArrondissement(data);
+    const { data } = await api.put(`/arrondissements/${id}`, payload);
+    const raw = data.data || data;
+    return {
+      id: raw.id,
+      name: raw.name,
+      prefectureVille: {
+        id: raw.ville?.id ?? 0,
+        prefecture: raw.prefecture?.name ?? null,
+        ville: raw.ville?.name ?? '',
+      },
+    };
   },
 
   delete: async (id: number): Promise<void> => {

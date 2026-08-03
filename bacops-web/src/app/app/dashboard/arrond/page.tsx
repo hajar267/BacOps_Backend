@@ -184,14 +184,14 @@ arrondissements.filter(
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-3">
                       <button onClick={() => setPrefectureToEdit(p)} className="text-text-secondary hover:text-text-primary transition-colors" aria-label="Modifier">
-                        ✎
+                        <Pencil className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => setPendingDelete({ type: 'prefectures', id: p.id, label: p.name })}
                         className="text-brand-error hover:text-brand-error/80 transition-colors"
                         aria-label="Supprimer"
                       >
-                        🗑
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -238,14 +238,14 @@ arrondissements.filter(
     <td className="px-6 py-4">
       <div className="flex items-center justify-end gap-3">
         <button onClick={() => setArrondToEdit(a)} className="text-text-secondary hover:text-text-primary transition-colors" aria-label="Modifier">
-          ✎
+          <Pencil className="w-4 h-4" />
         </button>
         <button
           onClick={() => setPendingDelete({ type: 'arrondissements', id: a.id, label: a.name })}
           className="text-brand-error hover:text-brand-error/80 transition-colors"
           aria-label="Supprimer"
         >
-          🗑
+          <Trash2 className="w-4 h-4" />
         </button>
       </div>
     </td>
