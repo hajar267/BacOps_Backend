@@ -23,6 +23,7 @@ Schema::create('prefectures', function (Blueprint $table) {
     /**
      * Reverse the migrations.
      */
+
     public function down(): void
     {
         Schema::dropIfExists('prefectures');

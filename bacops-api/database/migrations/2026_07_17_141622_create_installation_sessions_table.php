@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('installation_sessions', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('agent_id')->constrained('users');
-            $table->string('num_point')->nullable();
-            $table->double('location_lat')->nullable();
-            $table->double('location_lng')->nullable();
-            $table->string('address')->nullable();
-            $table->foreignId('arrondissement_id')->nullable()->constrained();
-            $table->timestamp('installed_at');
-        });
+        if (!Schema::hasTable('installation_sessions')) {
+            Schema::create('installation_sessions', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('agent_id')->constrained('users');
+                $table->string('num_point')->nullable();
+                $table->double('location_lat')->nullable();
+                $table->double('location_lng')->nullable();
+                $table->string('address')->nullable();
+                $table->foreignId('arrondissement_id')->nullable()->constrained();
+                $table->timestamp('installed_at');
+            });
+        }
     }
 
     /**

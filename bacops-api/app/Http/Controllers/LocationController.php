@@ -31,7 +31,7 @@ class LocationController extends Controller
         try {
             $arrondissement = $this->service->createArrondissement($request->validated());
 
-            return response()->json($arrondissement->load('prefectureVille'), 201);
+            return response()->json($arrondissement->load('ville', 'prefecture'), 201);
         } catch (\Exception $e) {
             \Log::error('Creating arrondissement failed: '.$e->getMessage(), ['exception' => $e]);
 
@@ -44,7 +44,7 @@ class LocationController extends Controller
         try {
             $arrondissement = $this->service->updateArrondissement($id, $request->validated());
 
-            return response()->json($arrondissement->load('prefectureVille'), 200);
+            return response()->json($arrondissement->load('ville', 'prefecture'), 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'Not Found', 'message' => 'Arrondissement not found'], 404);
         } catch (\Exception $e) {
