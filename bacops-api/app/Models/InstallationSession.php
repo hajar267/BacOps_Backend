@@ -1,9 +1,11 @@
 <?php
+
 // app/Models/InstallationSession.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InstallationSession extends Model
 {
@@ -17,7 +19,7 @@ class InstallationSession extends Model
         'location_lat',
         'location_lng',
         'address',
-        'arrond',
+        'arrondissement_id',
         'installed_at',
     ];
 
@@ -33,5 +35,10 @@ class InstallationSession extends Model
     public function installations()
     {
         return $this->hasMany(Installation::class, 'installation_session_id');
+    }
+
+    public function arrondissement(): BelongsTo
+    {
+        return $this->belongsTo(Arrondissement::class);
     }
 }

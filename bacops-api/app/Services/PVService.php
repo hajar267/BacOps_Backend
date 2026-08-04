@@ -1,10 +1,10 @@
 <?php
+
 // app/Services/PVService.php
 
 namespace App\Services;
 
 use App\Models\Attachment;
-use App\Models\Bac;
 use App\Models\Installation;
 use App\Models\InstallationSession;
 use App\Models\PV;
@@ -14,16 +14,14 @@ class PVService
 {
     private const BUCKET = 'pvs';
 
-    public function __construct(private SupabaseStorageService $storage)
-    {
-    }
+    public function __construct(private SupabaseStorageService $storage) {}
 
     public function createPv(array $params): PV
     {
         $year = now()->year;
         $count = PV::whereBetween('created_at', ["{$year}-01-01", "{$year}-12-31"])->count();
         $pvNumber = sprintf('PV-%d-%03d', $year, $count + 1);
-        $filename = "{$pvNumber}_" . now()->timestamp . '.pdf';
+        $filename = "{$pvNumber}_".now()->timestamp.'.pdf';
         $path = "unsigned/{$filename}";
 
         $pdfUrl = $this->storage->uploadBinary($params['fileBuffer'], $path, self::BUCKET, 'application/pdf');
@@ -47,7 +45,7 @@ class PVService
 
     public function uploadSignedPv(int $pvId, string $fileBuffer): PV
     {
-        $filename = "PV-{$pvId}_signed_" . now()->timestamp . '.pdf';
+        $filename = "PV-{$pvId}_signed_".now()->timestamp.'.pdf';
         $path = "signed/{$filename}";
 
         $signedUrl = $this->storage->uploadBinary($fileBuffer, $path, self::BUCKET, 'application/pdf');
@@ -81,7 +79,7 @@ class PVService
             ->whereHas('bac', function ($q) use ($bacTypeFilter) {
                 $q->where('status', 'en_service');
 
-                if (!empty($bacTypeFilter)) {
+                if (! empty($bacTypeFilter)) {
                     $q->whereHas('bacType', function ($q2) use ($bacTypeFilter) {
                         foreach ($bacTypeFilter as $field => $value) {
                             $q2->where($field, $value);
@@ -92,11 +90,13 @@ class PVService
             ->whereHas('session', function ($q) use ($startDate, $endDate, $filters) {
                 $q->whereBetween('installed_at', [$startDate, $endDate]);
 
-                if (!empty($filters['arrond'])) {
-                    $q->where('arrond', $filters['arrond']);
+                if (! empty($filters['arrondissement_id'])) {
+                    $q->where('arrondissement_id', $filters['arrondissement_id']);
+                } elseif (! empty($filters['arrond'])) {
+                    $q->whereHas('arrondissement', fn ($q2) => $q2->where('name', $filters['arrond']));
                 }
             })
-            ->with(['bac.bacType', 'session'])
+            ->with(['bac.bacType', 'session.arrondissement'])
             ->get();
 
         if ($installations->isEmpty()) {
@@ -119,7 +119,7 @@ class PVService
                 'capacite' => $inst->bac->bacType->capacite,
                 'matiere' => $inst->bac->bacType->matiere,
                 'serialNumber' => $inst->bac->serial_number,
-                'arrond' => $inst->session->arrond,
+                'arrond' => $inst->session->arrondissement?->name,
                 'installedAt' => $inst->session->installed_at->toIso8601String(),
                 'address' => $inst->session->address,
                 'x' => $inst->location_lat ?? $inst->session->location_lat,
@@ -132,6 +132,7 @@ class PVService
     private function getMinInstallationDate(): Carbon
     {
         $min = InstallationSession::min('installed_at');
+
         return $min ? Carbon::parse($min) : Carbon::createFromTimestamp(0);
     }
 }

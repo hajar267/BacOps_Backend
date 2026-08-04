@@ -28,7 +28,7 @@ class PreviewPvRequest extends FormRequest
             'matiere' => ['sometimes', 'nullable', 'string'],
             'startDate' => ['sometimes', 'nullable', 'date'],
             'endDate' => ['sometimes', 'nullable', 'date'],
-            'arrond' => ['sometimes', 'nullable', 'string'],
+            'arrondissement_id' => ['sometimes', 'nullable', 'integer', 'exists:arrondissements,id'],
         ];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 // app/Services/InstallService.php
 
 namespace App\Services;
@@ -7,8 +8,8 @@ use App\Exceptions\InstallServiceException;
 use App\Models\Attachment;
 use App\Models\Bac;
 use App\Models\BacHasRFID;
-use App\Models\InstallationSession;
 use App\Models\Installation;
+use App\Models\InstallationSession;
 use App\Models\RFID;
 use App\Models\StockSummaryBac;
 use App\Models\StockSummaryRFID;
@@ -20,8 +21,7 @@ class InstallService
         private BacStockService $bacService,
         private RfidStockService $rfidService,
         private PhotoUploadService $photoService,
-    ) {
-    }
+    ) {}
 
     private function normalizeText($value): string
     {
@@ -30,7 +30,7 @@ class InstallService
 
     private function parseLocalisation(?string $value): array
     {
-        if (!$value) {
+        if (! $value) {
             return ['latitude' => null, 'longitude' => null];
         }
 
@@ -58,6 +58,7 @@ class InstallService
         foreach ($values as $value) {
             if (isset($seen[$value])) {
                 $duplicates[$value] = true;
+
                 continue;
             }
             $seen[$value] = true;
@@ -70,7 +71,7 @@ class InstallService
     {
         $summary = StockSummaryBac::where('bac_type_id', $bacTypeId)->first();
 
-        if (!$summary) {
+        if (! $summary) {
             StockSummaryBac::create([
                 'bac_type_id' => $bacTypeId,
                 'total' => 1,
@@ -80,6 +81,7 @@ class InstallService
                 'perdu' => 0,
                 'mis_en_rebut' => 0,
             ]);
+
             return;
         }
 
@@ -95,13 +97,14 @@ class InstallService
     {
         $summary = StockSummaryRFID::first();
 
-        if (!$summary) {
+        if (! $summary) {
             StockSummaryRFID::create([
                 'total' => 1,
                 'disponible' => 0,
                 'en_service' => 1,
                 'perdu' => 0,
             ]);
+
             return;
         }
 
@@ -152,7 +155,7 @@ class InstallService
 
     public function confirmInstallation(array $installation, int $currentUserId): array
     {
-        if (empty($installation['bacs']) || !is_array($installation['bacs'])) {
+        if (empty($installation['bacs']) || ! is_array($installation['bacs'])) {
             throw new InstallServiceException('installation.bacs is required', 400);
         }
 
@@ -177,11 +180,11 @@ class InstallService
         $location = $installation['location'] ?? [];
         $sessionPoint = $this->normalizeText($location['pointDeRegroupement'] ?? null);
         $sessionAddress = $this->normalizeText($location['address'] ?? null);
-        $sessionArrond = $this->normalizeText($location['arrondissement'] ?? null);
+        $sessionArrondissementId = ! empty($location['arrondissement_id']) ? (int) $location['arrondissement_id'] : null;
 
-        $installedAt = !empty($installation['installedAt'])
+        $installedAt = ! empty($installation['installedAt'])
             ? \DateTime::createFromFormat(\DateTime::ATOM, $installation['installedAt']) ?: new \DateTime($installation['installedAt'])
-            : new \DateTime();
+            : new \DateTime;
 
         $availability = [];
         foreach ($installation['bacs'] as $index => $pair) {
@@ -207,11 +210,12 @@ class InstallService
             ];
         }
 
-        $failedAvailability = array_filter($availability, fn ($item) => !$item['canInstall']);
+        $failedAvailability = array_filter($availability, fn ($item) => ! $item['canInstall']);
 
         if (count($failedAvailability) > 0) {
             $conflictResults = array_map(function ($item) {
                 unset($item['bacItem'], $item['rfidItem']);
+
                 return $item;
             }, $availability);
 
@@ -221,7 +225,7 @@ class InstallService
         }
 
         $photoUrl = null;
-        if (!empty($installation['photo'])) {
+        if (! empty($installation['photo'])) {
             try {
                 $photoUrl = $this->photoService->uploadPhoto($installation['photo']);
             } catch (\Exception $e) {
@@ -230,7 +234,7 @@ class InstallService
         }
 
         $result = DB::transaction(function () use (
-            $currentUserId, $sessionPoint, $parsedLocalisation, $sessionAddress, $sessionArrond,
+            $currentUserId, $sessionPoint, $parsedLocalisation, $sessionAddress, $sessionArrondissementId,
             $installedAt, $photoUrl, $availability
         ) {
             $session = InstallationSession::create([
@@ -239,7 +243,7 @@ class InstallService
                 'location_lat' => $parsedLocalisation['latitude'],
                 'location_lng' => $parsedLocalisation['longitude'],
                 'address' => $sessionAddress ?: null,
-                'arrond' => $sessionArrond ?: null,
+                'arrondissement_id' => $sessionArrondissementId,
                 'installed_at' => $installedAt,
             ]);
 
@@ -256,7 +260,7 @@ class InstallService
             $installations = [];
 
             foreach ($availability as $item) {
-                if (!$item['bacItem'] || !$item['rfidItem']) {
+                if (! $item['bacItem'] || ! $item['rfidItem']) {
                     throw new InstallServiceException('Unable to resolve Bac/RFID pair during installation', 409);
                 }
 

@@ -1,4 +1,5 @@
 <?php
+
 // app/Services/SearchService.php
 
 namespace App\Services;
@@ -19,14 +20,14 @@ class SearchService
         }
 
         $link = BacHasRFID::whereHas('rfid', function ($q) use ($normalizedRfid) {
-                $q->where('rfid_code', $normalizedRfid);
-            })
+            $q->where('rfid_code', $normalizedRfid);
+        })
             ->whereNull('unassigned_at')
             ->orderByDesc('assigned_at')
             ->with(['bac.bacType', 'rfid'])
             ->first();
 
-        if (!$link) {
+        if (! $link) {
             return null;
         }
 
@@ -38,7 +39,7 @@ class SearchService
         // installation history), but worth knowing if this table ever grows huge.
         $currentInstallation = Installation::where('bac_id', $bac->id)
             ->whereNull('uninstalled_at')
-            ->with('session')
+            ->with('session.arrondissement')
             ->get()
             ->sortByDesc(fn ($i) => $i->session?->installed_at)
             ->first();
@@ -57,7 +58,7 @@ class SearchService
             ],
             'currentInstallation' => $currentInstallation ? [
                 'address' => $currentInstallation->session->address,
-                'arrond' => $currentInstallation->session->arrond,
+                'arrond' => $currentInstallation->session->arrondissement?->name,
                 'locationLat' => $currentInstallation->location_lat,
                 'locationLng' => $currentInstallation->location_lng,
                 'installedAt' => $currentInstallation->session->installed_at->toIso8601String(),
@@ -73,7 +74,7 @@ class SearchService
 
         $bac = Bac::with(['addedByUser', 'installations.session.agent'])->find($id);
 
-        if (!$bac) {
+        if (! $bac) {
             throw new SearchServiceException('Bac introuvable', 404);
         }
 

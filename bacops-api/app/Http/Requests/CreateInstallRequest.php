@@ -39,7 +39,7 @@ class CreateInstallRequest extends FormRequest
             'installation.bacs.*.rfidSerie' => ['required', 'string', 'min:1'],
 
             'installation.location' => ['sometimes', 'array'],
-            'installation.location.arrondissement' => ['required_with:installation.location', 'string', 'min:1'],
+            'installation.location.arrondissement_id' => ['required_with:installation.location', 'integer', 'exists:arrondissements,id'],
             'installation.location.address' => ['required_with:installation.location', 'string', 'min:1'],
             'installation.location.pointDeRegroupement' => ['sometimes', 'string'],
 

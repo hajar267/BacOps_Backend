@@ -1,0 +1,17 @@
+[90m= [39m[34;4mIlluminate\Support\Collection[39;24m {#7500
+    [34mall[39m: [
+      {#7504
+        +"[1mid[22m": [35m1[39m,
+        +"[1mserial_number[22m": [32m"[39m[32m2026-1[39m[32m"[39m,
+        +"[1mstatus[22m": [32m"[39m[32men_stock[39m[32m"[39m,
+        +"[1mbac_type_id[22m": [35m1[39m,
+        +"[1mcommande_id[22m": [35m1[39m,
+        +"[1madded_by[22m": [35m2[39m,
+        +"[1mupdated_by[22m": [36mnull[39m,
+        +"[1mcommentaire[22m": [36mnull[39m,
+        +"[1mdeleted_at[22m": [36mnull[39m,
+        +"[1mcreated_at[22m": [32m"[39m[32m2026-08-03 14:47:40[39m[32m"[39m,
+        +"[1mupdated_at[22m": [32m"[39m[32m2026-08-03 14:47:40[39m[32m"[39m,
+      },
+    ],
+  }
