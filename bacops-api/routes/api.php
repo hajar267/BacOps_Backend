@@ -17,6 +17,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\VilleController;
 use App\Http\Controllers\PrefectureController;
 use App\Http\Controllers\ArrondissementController;
+use App\Http\Controllers\SupplierController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -130,6 +131,13 @@ Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
     Route::put('/roles/{role}', [RoleController::class, 'update']);
     Route::delete('/roles/{role}', [RoleController::class, 'destroy']);
 });
+
+Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
+    Route::get('/suppliers', [SupplierController::class, 'index']);
+});
+
+Route::post('/suppliers', [SupplierController::class, 'store'])
+    ->middleware(['auth:api', 'permission:admin:create']);
 
 // ////////testing stuff
 // Route::get('/hello', function () {
