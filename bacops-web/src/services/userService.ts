@@ -29,12 +29,13 @@ export const userService = {
   },
 
   listRoles: async (): Promise<RoleOption[]> => {
-    // TODO: replace with real API call, e.g. api.get('/roles')
-    return [
-      { name: 'admin', label: 'Admin' },
-      { name: 'magasin', label: 'Magasinier' },
-      { name: 'install', label: 'Installation' },
-    ];
+    const { data } = await api.get('/roles');
+    const roles = Array.isArray(data) ? data : data?.data ?? [];
+
+    return roles.map((role: { id?: number; name: string }) => ({
+      name: role.name,
+      label: role.name,
+    }));
   },
 
   delete: async (id: number): Promise<void> => {

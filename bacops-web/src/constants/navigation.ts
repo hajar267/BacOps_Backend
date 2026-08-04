@@ -44,6 +44,7 @@ export const NAV_ITEMS: Record<string, NavEntry[]> = {
         { label: 'Types de bac', href: '/app/dashboard/types', icon: 'box' },
         { label: 'Procès-Verbaux', href: '/app/dashboard/pv', icon: 'file' },
         { label: 'Gestion des arronds', href: '/app/dashboard/arrond', icon: 'map' },
+        { label: 'fournisseurs', href: '/app/dashboard/supplier', icon: 'truck' },
       ],
     },
   ],

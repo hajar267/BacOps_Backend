@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LogOut, LayoutDashboard, FileText, Users, Box, Tag,
-  ListChecks, Settings, User, Lock, ChevronDown, ChevronRight, Shield, MapPinned
+  ListChecks, Settings, User, Lock, ChevronDown, ChevronRight, Shield, MapPinned, Truck
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getInitials } from '@/utils/initials';
@@ -23,6 +23,7 @@ const ICONS: Record<string, React.ElementType> = {
   lock: Lock,
   Shield: Shield,
   map: MapPinned,
+  truck: Truck,
 };
 
 export function Sidebar() {
