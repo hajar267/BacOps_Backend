@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('pvs', function (Blueprint $table) {
@@ -20,16 +17,13 @@ return new class extends Migration
             $table->timestamp('end_date')->nullable();
             $table->string('filter_capacite')->nullable();
             $table->string('filter_matiere')->nullable();
-            $table->string('pdf_url')->nullable();
             $table->string('signed_pdf_url')->nullable();
             $table->timestamp('signed_at')->nullable();
             $table->timestamp('created_at')->useCurrent();
+
+            $table->index(['admin_id', 'contract_num', 'start_date', 'end_date', 'filter_capacite', 'filter_matiere'], 'pvs_dedupe_idx');
         });
     }
-
-    /**
-     * Reverse the migrations.
-     */
 
     public function down(): void
     {

@@ -139,6 +139,12 @@ Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
 Route::post('/suppliers', [SupplierController::class, 'store'])
     ->middleware(['auth:api', 'permission:admin:create']);
 
+
+Route::middleware('auth:api')->get('/pvs/{pv}/signed-pdf', [PVController::class, 'signedPdf'])->name('pvs.signed-pdf');
+
+Route::middleware('auth:api')->get('/attachments/{attachment}/file', [AttachmentController::class, 'file'])->name('attachments.file');
+
+
 // ////////testing stuff
 // Route::get('/hello', function () {
 //     return response()->json([

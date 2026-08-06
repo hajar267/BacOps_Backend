@@ -23,7 +23,6 @@ class CreatePvRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => ['required', 'file', 'mimes:pdf'],
             'contractNum' => ['sometimes', 'string'],
             'startDate' => ['sometimes', 'nullable', 'date'],
             'endDate' => ['sometimes', 'nullable', 'date'],

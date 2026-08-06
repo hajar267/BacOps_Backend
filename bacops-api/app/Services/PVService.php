@@ -1,7 +1,5 @@
 <?php
 
-// app/Services/PVService.php
-
 namespace App\Services;
 
 use App\Models\Attachment;
@@ -9,32 +7,31 @@ use App\Models\Installation;
 use App\Models\InstallationSession;
 use App\Models\PV;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class PVService
 {
-    private const BUCKET = 'pvs';
+    private const DISK = 'local';
 
-    public function __construct(private SupabaseStorageService $storage) {}
-
-    public function createPv(array $params): PV
+    public function generateOrReuseUnsignedPv(array $params): PV
     {
-        $year = now()->year;
-        $count = PV::whereBetween('created_at', ["{$year}-01-01", "{$year}-12-31"])->count();
-        $pvNumber = sprintf('PV-%d-%03d', $year, $count + 1);
-        $filename = "{$pvNumber}_".now()->timestamp.'.pdf';
-        $path = "unsigned/{$filename}";
-
-        $pdfUrl = $this->storage->uploadBinary($params['fileBuffer'], $path, self::BUCKET, 'application/pdf');
-
-        return PV::create([
+        $criteria = [
             'admin_id' => $params['adminId'],
             'contract_num' => $params['contractNum'] ?? '2/GD/CR/2022',
-            'pv_number' => $pvNumber,
             'start_date' => $params['startDate'] ?? null,
             'end_date' => $params['endDate'] ?? null,
             'filter_capacite' => $params['filterCapacite'] ?? null,
             'filter_matiere' => $params['filterMatiere'] ?? null,
-            'pdf_url' => $pdfUrl,
+        ];
+
+        $pv = PV::where($criteria)->whereNull('signed_at')->first();
+
+        if ($pv) {
+            return $pv;
+        }
+
+        return PV::create($criteria + [
+            'pv_number' => $this->nextPvNumber(),
         ]);
     }
 
@@ -43,25 +40,19 @@ class PVService
         return PV::orderByDesc('created_at')->get();
     }
 
-    public function uploadSignedPv(int $pvId, string $fileBuffer): PV
+    public function uploadSignedPv(int $pvId, string $fileBinary): PV
     {
-        $filename = "PV-{$pvId}_signed_".now()->timestamp.'.pdf';
-        $path = "signed/{$filename}";
+        $pv = PV::findOrFail($pvId);
+        $path = "pvs/{$pv->pv_number}/signed.pdf";
 
-        $signedUrl = $this->storage->uploadBinary($fileBuffer, $path, self::BUCKET, 'application/pdf');
+        Storage::disk(self::DISK)->put($path, $fileBinary);
 
-        try {
-            $pv = PV::findOrFail($pvId);
-            $pv->update([
-                'signed_pdf_url' => $signedUrl,
-                'signed_at' => now(),
-            ]);
+        $pv->update([
+            'signed_pdf_url' => $path,
+            'signed_at' => now(),
+        ]);
 
-            return $pv;
-        } catch (\Exception $e) {
-            $this->storage->remove($path, self::BUCKET);
-            throw $e;
-        }
+        return $pv;
     }
 
     public function previewBacs(array $filters): array
@@ -109,7 +100,7 @@ class PVService
             ->whereIn('ref_id', $sessionIds)
             ->where('type', 'photo')
             ->get()
-            ->unique('ref_id') // "take the first photo per session" — same as the JS Map dedup logic
+            ->unique('ref_id')
             ->keyBy('ref_id')
             ->map(fn ($a) => $a->url);
 
@@ -127,6 +118,14 @@ class PVService
                 'photo' => $photoMap->get($inst->session->id) ?? null,
             ];
         })->values()->all();
+    }
+
+    private function nextPvNumber(): string
+    {
+        $year = now()->year;
+        $count = PV::whereBetween('created_at', ["{$year}-01-01", "{$year}-12-31"])->count();
+
+        return sprintf('PV-%d-%03d', $year, $count + 1);
     }
 
     private function getMinInstallationDate(): Carbon

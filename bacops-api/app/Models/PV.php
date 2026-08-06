@@ -18,9 +18,9 @@ class PV extends Model
         'end_date',
         'filter_capacite',
         'filter_matiere',
-        'pdf_url',
         'signed_pdf_url',
         'signed_at',
+        'created_at',
     ];
 
     protected $casts = [

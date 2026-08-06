@@ -1,28 +1,25 @@
 <?php
-// app/Http/Resources/PVResource.php
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class PVResource extends JsonResource
 {
-    public function toArray(Request $request): array
+    public function toArray($request)
     {
         return [
             'id' => $this->id,
-            'adminId' => $this->admin_id,
-            'contractNum' => $this->contract_num,
             'pvNumber' => $this->pv_number,
-            'startDate' => $this->start_date?->toIso8601String(),
-            'endDate' => $this->end_date?->toIso8601String(),
+            'contractNum' => $this->contract_num,
+            'startDate' => $this->start_date,
+            'endDate' => $this->end_date,
             'filterCapacite' => $this->filter_capacite,
             'filterMatiere' => $this->filter_matiere,
-            'pdfUrl' => $this->pdf_url,
-            'signedPdfUrl' => $this->signed_pdf_url,
-            'signedAt' => $this->signed_at?->toIso8601String(),
-            'createdAt' => $this->created_at?->toIso8601String(),
+            'signedPdfUrl' => $this->signed_at ? route('pvs.signed-pdf', $this->id) : null,
+            'isSigned' => (bool) $this->signed_at,
+            'signedAt' => $this->signed_at,
+            'createdAt' => $this->created_at,
         ];
     }
 }
