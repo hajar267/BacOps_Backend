@@ -7,10 +7,8 @@ use App\Http\Requests\CreatePvRequest;
 use App\Http\Requests\PreviewPvRequest;
 use App\Http\Requests\UploadSignedPvRequest;
 use App\Http\Resources\PVResource;
-use App\Models\PV;
 use App\Services\PVService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
 
 class PVController extends Controller
 {
@@ -70,12 +68,5 @@ class PVController extends Controller
             \Log::error('Signed PV upload failed: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json(['error' => 'Internal Server Error', 'message' => 'Failed to upload signed PV'], 500);
         }
-    }
-
-    public function signedPdf(PV $pv)
-    {
-        abort_unless($pv->signed_pdf_url, 404);
-
-        return Storage::disk('local')->response($pv->signed_pdf_url, "{$pv->pv_number}.pdf");
     }
 }

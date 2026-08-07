@@ -16,7 +16,7 @@ class PVResource extends JsonResource
             'endDate' => $this->end_date,
             'filterCapacite' => $this->filter_capacite,
             'filterMatiere' => $this->filter_matiere,
-            'signedPdfUrl' => $this->signed_at ? route('pvs.signed-pdf', $this->id) : null,
+            'signedPdfUrl' => $this->signed_pdf_url,
             'isSigned' => (bool) $this->signed_at,
             'signedAt' => $this->signed_at,
             'createdAt' => $this->created_at,

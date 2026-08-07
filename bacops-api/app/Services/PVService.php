@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 class PVService
 {
-    private const DISK = 'local';
+    private const DISK = 'public';
 
     public function generateOrReuseUnsignedPv(array $params): PV
     {
@@ -48,13 +48,12 @@ class PVService
         Storage::disk(self::DISK)->put($path, $fileBinary);
 
         $pv->update([
-            'signed_pdf_url' => $path,
+            'signed_pdf_url' => Storage::disk(self::DISK)->url($path),
             'signed_at' => now(),
         ]);
 
         return $pv;
     }
-
     public function previewBacs(array $filters): array
     {
         $startDate = $filters['startDate'] ?? $this->getMinInstallationDate();
