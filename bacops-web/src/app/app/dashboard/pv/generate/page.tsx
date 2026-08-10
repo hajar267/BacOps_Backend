@@ -9,6 +9,8 @@ import { buildPvPdf } from '@/lib/pdf/buildPvPdf';
 import { PreviewBacItem, PvFilters } from '@/types/pv';
 import { ArrondissementListItem } from '@/types/location';
 import { BacTypeItem } from '@/types/bacType';
+import { DatePickerField } from '@/components/pv/DateRangeFilter';
+import { format } from 'date-fns';
 
 const ALL = 'Tous';
 
@@ -163,29 +165,22 @@ const handlePreview = async () => {
     }));
   }}
 /></div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-text-primary mb-1">
-                Date de début
-              </label>
-              <input
-                type="date"
-                className="w-full border border-surface-border rounded-lg px-3 py-2 text-sm"
-                onChange={(e) => setFilters((f) => ({ ...f, startDate: e.target.value }))}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-text-primary mb-1">
-                Date de fin
-              </label>
-              <input
-                type="date"
-                className="w-full border border-surface-border rounded-lg px-3 py-2 text-sm"
-                onChange={(e) => setFilters((f) => ({ ...f, endDate: e.target.value }))}
-              />
-            </div>
-          </div>
-
+<div className="grid grid-cols-2 gap-4">
+  <DatePickerField
+    label="Date de début"
+    value={filters.startDate ? new Date(filters.startDate) : undefined}
+    onChange={(date) =>
+      setFilters((f) => ({ ...f, startDate: date ? format(date, 'yyyy-MM-dd') : undefined }))
+    }
+  />
+  <DatePickerField
+    label="Date de fin"
+    value={filters.endDate ? new Date(filters.endDate) : undefined}
+    onChange={(date) =>
+      setFilters((f) => ({ ...f, endDate: date ? format(date, 'yyyy-MM-dd') : undefined }))
+    }
+  />
+</div>
           <button
             onClick={handlePreview}
             disabled={loading}

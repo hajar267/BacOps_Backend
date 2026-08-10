@@ -27,4 +27,5 @@ export async function GET(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: 'Fetch timed out' }, { status: 504 });
   }
+
 }
