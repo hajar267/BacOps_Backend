@@ -29,8 +29,7 @@ export interface PvFilters {
   nature?: string;
   capacite?: string;
   matiere?: string;
-  arrond?: string;
-  arrondissementId?: number;
+  arrondissement_id?: number;
   startDate?: string;
   endDate?: string;
 }

@@ -1,11 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { pvService } from '@/services/pvService';
 import { locationService } from '@/services/locationService';
-import { ArrondissementListItem } from '@/types/location';import { buildPvPdf } from '@/lib/pdf/buildPvPdf';
+import { bacTypeService } from '@/services/bacTypeService';
+import { buildPvPdf } from '@/lib/pdf/buildPvPdf';
 import { PreviewBacItem, PvFilters } from '@/types/pv';
+import { ArrondissementListItem } from '@/types/location';
+import { BacTypeItem } from '@/types/bacType';
 
 const ALL = 'Tous';
 
@@ -14,31 +17,61 @@ export default function GeneratePvPage() {
   const [step, setStep] = useState<'filters' | 'preview'>('filters');
   const [filters, setFilters] = useState<PvFilters>({});
   const [items, setItems] = useState<PreviewBacItem[]>([]);
+
+  const [bacTypes, setBacTypes] = useState<BacTypeItem[]>([]);
+  const [arrondissements, setArrondissements] = useState<ArrondissementListItem[]>([]);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-const [arrondissements, setArrondissements] = useState<ArrondissementListItem[]>([]);
+  useEffect(() => {
+    locationService.list().then(setArrondissements).catch(() => {});
+    bacTypeService.list().then(setBacTypes).catch(() => {});
+  }, []);
 
-useEffect(() => {
-  locationService.list().then(setArrondissements).catch(() => {});
-}, []);
-  const handlePreview = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await pvService.preview(filters);
-      if (data.length === 0) {
-        setError('Aucun bac trouvé pour ces critères');
-        return;
-      }
-      setItems(data);
-      setStep('preview');
-    } catch {
-      setError('Erreur lors de la récupération des données');
-    } finally {
-      setLoading(false);
+  const availableNatures = useMemo(
+    () => Array.from(new Set(bacTypes.map((b) => b.nature))).sort(),
+    [bacTypes]
+  );
+
+  const availableCapacites = useMemo(() => {
+    const pool = filters.nature ? bacTypes.filter((b) => b.nature === filters.nature) : bacTypes;
+    return Array.from(new Set(pool.map((b) => b.capacite))).sort();
+  }, [bacTypes, filters.nature]);
+
+  const availableMatieres = useMemo(() => {
+    const pool = bacTypes.filter(
+      (b) =>
+        (!filters.nature || b.nature === filters.nature) &&
+        (!filters.capacite || b.capacite === filters.capacite)
+    );
+    return Array.from(new Set(pool.map((b) => b.matiere))).sort();
+  }, [bacTypes, filters.nature, filters.capacite]);
+
+  // ...handlePreview, handleDownloadAndSave stay the same as before
+const handlePreview = async () => {
+  setLoading(true);
+  setError(null);
+  try {
+    const data = await pvService.preview(filters);
+    console.log('preview response:', data); // ← temporary, check devtools
+    if (!Array.isArray(data)) {
+      setError('Réponse inattendue du serveur');
+      return;
     }
-  };
+    if (data.length === 0) {
+      setError('Aucun bac trouvé pour ces critères');
+      return;
+    }
+    setItems(data);
+    setStep('preview');
+  } catch (e) {
+    console.error('preview error:', e); // ← temporary
+    setError('Erreur lors de la récupération des données');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleDownloadAndSave = async () => {
     setLoading(true);
@@ -60,7 +93,7 @@ useEffect(() => {
       });
 
       doc.save(`PV_${Date.now()}.pdf`);
-      router.push('/pv');
+      router.push('/app/dashboard/pv');
     } catch {
       setError('Erreur lors de la génération du PDF');
     } finally {
@@ -80,35 +113,56 @@ useEffect(() => {
 
       {step === 'filters' && (
         <div className="bg-white border border-surface-border rounded-xl p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <FilterSelect
-              label="Nature"
-              value={filters.nature ?? ALL}
-              options={[ALL, 'plastique', 'metal']}
-              onChange={(v) => setFilters((f) => ({ ...f, nature: v === ALL ? undefined : v }))}
-            />
-            <FilterSelect
-              label="Capacité"
-              value={filters.capacite ?? ALL}
-              options={[ALL, '120L', '240L', '360L']}
-              onChange={(v) => setFilters((f) => ({ ...f, capacite: v === ALL ? undefined : v }))}
-            />
-          </div>
+<div className="grid grid-cols-2 gap-4">
+<FilterSelect
+  label="Nature"
+  value={filters.nature ?? ALL}
+  options={[ALL, ...availableNatures]}
+  onChange={(v) =>
+    setFilters((f) => ({
+      ...f,
+      nature: v === ALL ? undefined : v,
+      capacite: undefined, // reset downstream
+      matiere: undefined,
+    }))
+  }
+/>
+<FilterSelect
+  label="Capacité"
+  value={filters.capacite ?? ALL}
+  options={[ALL, ...availableCapacites]}
+  onChange={(v) =>
+    setFilters((f) => ({
+      ...f,
+      capacite: v === ALL ? undefined : v,
+      matiere: undefined, // reset downstream
+    }))
+  }
+/></div>
 
+<div className="grid grid-cols-2 gap-4">
+<FilterSelect
+  label="Matière"
+  value={filters.matiere ?? ALL}
+  options={[ALL, ...availableMatieres]}
+  onChange={(v) => setFilters((f) => ({ ...f, matiere: v === ALL ? undefined : v }))}
+/>
 <FilterSelect
   label="Arrondissement"
-  value={filters.arrond ?? ALL}
+  value={
+    filters.arrondissement_id
+      ? arrondissements.find((a) => a.id === filters.arrondissement_id)?.name ?? ALL
+      : ALL
+  }
   options={[ALL, ...arrondissements.map((a) => a.name)]}
   onChange={(v) => {
     const match = arrondissements.find((a) => a.name === v);
     setFilters((f) => ({
       ...f,
-      arrond: v === ALL ? undefined : v,
-      arrondissementId: match?.id,
+      arrondissement_id: v === ALL ? undefined : match?.id,
     }));
   }}
-/>
-
+/></div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-text-primary mb-1">
@@ -154,7 +208,7 @@ useEffect(() => {
                 </tr>
               </thead>
               <tbody>
-                {items.map((item, i) => (
+                {Array.isArray(items) && items.map((item, i) => (
                   <tr key={i} className="border-t border-surface-border">
                     <td className="px-3 py-2">{item.nature}</td>
                     <td className="px-3 py-2">{item.capacite}</td>
