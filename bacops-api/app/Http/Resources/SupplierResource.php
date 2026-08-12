@@ -7,11 +7,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class SupplierResource extends JsonResource
 {
-    public function toArray(Request $request): array
-    {
-        return [
-            'id' => $this->id,
-            'nom' => $this->nom,
-        ];
-    }
+public function toArray(Request $request): array
+{
+    return [
+        'id'       => $this->id,
+        'nom'      => $this->nom,
+        'logoUrl'  => $this->logo_path ? asset('storage/' . $this->logo_path) : null,
+    ];
+}
 }

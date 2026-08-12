@@ -11,5 +11,6 @@ class Supplier extends Model
 
     protected $fillable = [
         'nom',
+        'logo_path',
     ];
 }

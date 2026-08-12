@@ -24,5 +24,7 @@ class StoreSupplierRequest extends FormRequest
     {
         return [
             'nom' => ['required', 'string', 'min:1'],
+            'logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:2048'],
         ];
-    }}
+    }
+}

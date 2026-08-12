@@ -22,12 +22,15 @@ class SupplierController extends Controller
         ]);
     }
 
-    public function store(StoreSupplierRequest $request): JsonResponse
-    {
-        $supplier = $this->supplierService->create($request->validated());
+public function store(StoreSupplierRequest $request): JsonResponse
+{
+    $supplier = $this->supplierService->create(
+        $request->validated(),
+        $request->file('logo')
+    );
 
-        return response()->json([
-            'supplier' => new SupplierResource($supplier),
-        ], 201);
-    }
+    return response()->json([
+        'supplier' => new SupplierResource($supplier),
+    ], 201);
+}
 }
