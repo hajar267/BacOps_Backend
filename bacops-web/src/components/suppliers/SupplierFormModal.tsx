@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { X } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { X, Upload, Factory } from 'lucide-react';
 import { supplierService } from '@/services/suppliersService';
 import { SupplierItem } from '@/types/supplier';
 
@@ -10,10 +10,34 @@ interface SupplierFormModalProps {
   onSaved: (saved: SupplierItem) => void;
 }
 
+const MAX_SIZE = 2 * 1024 * 1024; // 2MB
+const ALLOWED_TYPES = ['image/png', 'image/jpeg'];
+
 export function SupplierFormModal({ onClose, onSaved }: SupplierFormModalProps) {
   const [nom, setNom] = useState('');
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setError('Format non supporté. Utilisez PNG ou JPG.');
+      return;
+    }
+    if (file.size > MAX_SIZE) {
+      setError('Le fichier dépasse 2 Mo.');
+      return;
+    }
+
+    setError(null);
+    setLogoFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  };
 
   const handleSubmit = async () => {
     if (!nom.trim()) {
@@ -25,7 +49,7 @@ export function SupplierFormModal({ onClose, onSaved }: SupplierFormModalProps) 
     setError(null);
 
     try {
-      const saved = await supplierService.create({ nom: nom.trim() });
+      const saved = await supplierService.create({ nom: nom.trim(), logo: logoFile });
       onSaved(saved);
       onClose();
     } catch (err) {
@@ -50,6 +74,38 @@ export function SupplierFormModal({ onClose, onSaved }: SupplierFormModalProps) 
             {error}
           </p>
         )}
+
+        <div className="mb-4 flex items-center gap-3">
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className="flex h-16 w-16 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-dashed border-border bg-background"
+          >
+            {previewUrl ? (
+              <img src={previewUrl} alt="Logo preview" className="h-full w-full object-cover" />
+            ) : (
+              <Factory className="h-6 w-6 text-text-secondary/50" />
+            )}
+          </div>
+          <div>
+            <p className="mb-1 text-xs text-text-secondary">Logo</p>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-text-secondary hover:bg-background"
+            >
+              <Upload className="h-3.5 w-3.5" />
+              Choisir un fichier
+            </button>
+            <p className="mt-1 text-[11px] text-text-secondary/70">PNG, JPG jusqu à 2 Mo</p>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png, image/jpeg"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+        </div>
 
         <label className="mb-1 block text-xs text-text-secondary">Nom</label>
         <input
