@@ -148,7 +148,8 @@ Route::middleware('auth:api')->get('/attachments/{attachment}/file', [Attachment
 Route::middleware(['auth:api', 'permission:stock:read'])->group(function () {
     Route::get('/cadre-commandes', [CadreCommandeController::class, 'index']);
 });
-
+Route::post('/cadre-commandes', [CadreCommandeController::class, 'store'])
+    ->middleware(['auth:api', 'permission:admin:create']);
 
 // ////////testing stuff
 // Route::get('/hello', function () {
