@@ -18,6 +18,7 @@ use App\Http\Controllers\VilleController;
 use App\Http\Controllers\PrefectureController;
 use App\Http\Controllers\ArrondissementController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\CadreCommandeController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -143,6 +144,10 @@ Route::post('/suppliers', [SupplierController::class, 'store'])
 // Route::middleware('auth:api')->get('/pvs/{pv}/signed-pdf', [PVController::class, 'signedPdf'])->name('pvs.signed-pdf');
 
 Route::middleware('auth:api')->get('/attachments/{attachment}/file', [AttachmentController::class, 'file'])->name('attachments.file');
+
+Route::middleware(['auth:api', 'permission:stock:read'])->group(function () {
+    Route::get('/cadre-commandes', [CadreCommandeController::class, 'index']);
+});
 
 
 // ////////testing stuff

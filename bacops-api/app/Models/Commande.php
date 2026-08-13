@@ -12,7 +12,7 @@ class Commande extends Model
 
     protected $fillable = [
         'cadre_commande_id',
-        'fournisseur',
+        'fournisseur_id',
         'price',
         'quantite',
         'commentaire',
@@ -36,5 +36,10 @@ class Commande extends Model
     public function bacs()
     {
         return $this->hasMany(Bac::class, 'commande_id');
+    }
+
+    public function fournisseur()
+    {
+        return $this->belongsTo(Supplier::class, 'fournisseur_id');
     }
 }

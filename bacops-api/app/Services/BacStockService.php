@@ -9,6 +9,7 @@ use App\Models\BacType;
 use App\Models\CadreCommande;
 use App\Models\Commande;
 use App\Models\StockSummaryBac;
+use App\Models\Supplier;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
 
@@ -21,8 +22,8 @@ class BacStockService
         $capacite = trim($input['capacite']);
         $matiere = trim($input['matiere']);
         $color = trim($input['color']);
-        $cadreCommandeLabel = trim($input['cadre_commande']);
-        $fournisseur = trim($input['fournisseur']);
+        $cadreCommandeId = $input['cadre_commande_id'];
+        $fournisseurId = $input['fournisseur_id'];
         $commentaire = $input['commentaire'] ?? null;
 
         $this->assertValid($prefix !== '', 'Le champ prefix ne doit pas être vide');
@@ -34,14 +35,12 @@ class BacStockService
         $this->assertValid($capacite !== '', 'Le champ capacite ne doit pas être vide');
         $this->assertValid($matiere !== '', 'Le champ matiere ne doit pas être vide');
         $this->assertValid($color !== '', 'Le champ color ne doit pas être vide');
-        $this->assertValid($cadreCommandeLabel !== '', 'Le champ cadre_commande ne doit pas être vide');
         $this->assertValid(is_int($input['quantite']) && $input['quantite'] > 0, 'Le champ quantite doit être un entier positif');
         $this->assertValid(
             ($input['numero_fin'] - $input['numero_debut'] + 1) === $input['quantite'],
             'La quantité ne correspond pas à la plage de numéros de série'
         );
         $this->assertValid(is_numeric($input['prix']) && $input['prix'] > 0, 'Le champ prix doit être un nombre positif');
-        $this->assertValid($fournisseur !== '', 'Le champ fournisseur ne doit pas être vide');
 
         $bacType = BacType::where('nature', $nature)
             ->where('capacite', $capacite)
@@ -53,10 +52,16 @@ class BacStockService
             throw new StockServiceException('Type de bac introuvable pour cette combinaison nature/capacité/matière', 404);
         }
 
-        $cadreCommande = CadreCommande::where('label', $cadreCommandeLabel)->first();
+        $cadreCommande = CadreCommande::find($cadreCommandeId);
 
         if (!$cadreCommande) {
-            throw new StockServiceException("Cadre de commande '{$cadreCommandeLabel}' introuvable", 404);
+            throw new StockServiceException('Cadre de commande introuvable', 404);
+        }
+
+        $fournisseur = Supplier::find($fournisseurId);
+
+        if (!$fournisseur) {
+            throw new StockServiceException('Fournisseur introuvable', 404);
         }
 
         $serialNumbers = [];
@@ -73,14 +78,14 @@ class BacStockService
 
         try {
             $result = DB::transaction(function () use (
-                $cadreCommande, $currentUserId, $input, $fournisseur, $commentaire, $bacType, $serialNumbers
+                $cadreCommande, $fournisseur, $currentUserId, $input, $commentaire, $bacType, $serialNumbers
             ) {
                 $commande = Commande::create([
                     'cadre_commande_id' => $cadreCommande->id,
+                    'fournisseur_id' => $fournisseur->id,
                     'added_by' => $currentUserId,
                     'quantite' => $input['quantite'],
                     'price' => $input['prix'],
-                    'fournisseur' => $fournisseur,
                     'commentaire' => $commentaire,
                 ]);
 
@@ -135,14 +140,14 @@ class BacStockService
         ];
     }
 
-    private function assertValid(bool $condition, string $message): void
-    {
-        if (!$condition) {
-            throw new StockServiceException($message, 400);
-        }
+private function assertValid(bool $condition, string $message): void
+{
+    if (!$condition) {
+        throw new StockServiceException($message, 400);
     }
+}
 
-    public function findBacTypeIdsBySiteInfo(array $siteInfo): array
+public function findBacTypeIdsBySiteInfo(array $siteInfo): array
 {
     if (empty($siteInfo)) {
         return [];
