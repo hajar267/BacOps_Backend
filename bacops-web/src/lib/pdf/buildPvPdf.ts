@@ -25,15 +25,14 @@ export async function buildPvPdf({
 
   // Fetch logo + all row photos as data URLs in parallel — no need to
   // chunk pages manually, autoTable handles that for us below.
-const [logo, photos] = await Promise.all([
-  urlToDataUrl('/images/arma_logo.jpg', { direct: true }), // local Next.js asset, no proxy
-  Promise.all(items.map((item) => urlToDataUrl(item.photo))), // Laravel URLs, via proxy
-]);
-
-  drawHeader(doc, { contractNum, date, societeDelegataire, representant, logo });
+  const [logo, photos] = await Promise.all([
+    urlToDataUrl('/images/arma_logo.jpg', { direct: true }), // local Next.js asset, no proxy
+    Promise.all(items.map((item) => urlToDataUrl(item.photo))), // Laravel URLs, via proxy
+  ]);
 
   autoTable(doc, {
-    startY: 30,
+    startY: 50, // page 1 only — leaves room for the custom header
+    rowPageBreak: 'avoid',
     head: [[
       'N°', 'Type', 'Capacité (L)', 'N° CUVE', 'Arrond.', 'Date',
       'Adresse', 'X', 'Y', 'Photo', 'Paraphe Délégant', 'Paraphe Délégataire',
@@ -53,7 +52,7 @@ const [logo, photos] = await Promise.all([
     styles: { fontSize: 7, cellPadding: 2, valign: 'middle', halign: 'center' },
     headStyles: { fillColor: ARMA_BLUE, textColor: '#FFFFFF', fontStyle: 'bold' },
     columnStyles: { 9: { cellWidth: 22, minCellHeight: 16 } }, // photo column
-    margin: { top: 30 },
+    margin: { top: 15, bottom: 15 }, // pages 2+ — just enough room for the repeated table head
     theme: 'grid',
     didDrawCell: (data) => {
       if (data.section === 'body' && data.column.index === 9) {
@@ -70,7 +69,12 @@ const [logo, photos] = await Promise.all([
         }
       }
     },
-    didDrawPage: () => drawFooter(doc),
+    didDrawPage: (data) => {
+      if (data.pageNumber === 1) {
+        drawHeader(doc, { contractNum, date, societeDelegataire, representant, logo });
+      }
+      drawFooter(doc);
+    },
   });
 
   return doc;
@@ -108,8 +112,8 @@ function drawHeader(
 
   doc.setTextColor(ARMA_BLUE);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(13);
-  doc.text('Fiche de constat de mise en service', pageWidth / 2, 13, { align: 'center' });
+  doc.setFontSize(17);
+  doc.text('Fiche de constat de mise en service', pageWidth / 2, 15, { align: 'center' });
 
   doc.setFillColor(ARMA_BLUE);
   doc.rect(pageWidth - 34, 6, 20, 14, 'F');
@@ -121,14 +125,15 @@ function drawHeader(
     ['Représentant du Délégataire', representant],
   ];
   const colWidth = (pageWidth - 28) / fields.length;
-  doc.setFontSize(7);
   fields.forEach(([label, value], i) => {
     const x = 14 + i * colWidth;
     doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
     doc.setTextColor(TEXT_PRIMARY);
-    doc.text(label, x, 25);
+    doc.text(label, x, 30);
     doc.setFont('helvetica', 'normal');
-    doc.text(value, x, 28);
+    doc.setFontSize(9);
+    doc.text(value, x, 38);
   });
 }
 
