@@ -20,6 +20,14 @@ export type NavEntry = NavLink | NavGroup;
 export const NAV_ITEMS: Record<string, NavEntry[]> = {
   admin: [
     {
+  type: 'group',
+  label: 'Tableau de bord',
+  icon: 'layoutdashboard',
+  items: [
+    { label: 'tableau', href: '/app/dashboard', icon: 'layoutdashboard' },
+  ],
+},
+    {
       type: 'group',
       label: 'Mon compte',
       icon: 'user',
