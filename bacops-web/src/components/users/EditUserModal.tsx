@@ -220,7 +220,7 @@ export function EditUserModal({
               }
               className={`relative h-7 w-12 rounded-full transition ${
                 active
-                  ? 'bg-brand-success'
+                  ? 'bg-state-success'
                   : 'bg-surface-border'
               }`}
             >

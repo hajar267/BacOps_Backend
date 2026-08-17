@@ -13,9 +13,14 @@ export default function DashboardLayout({
   if (!isAuthenticated) return null;
 
   return (
-    <div className="min-h-screen flex bg-surface-bg">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto">{children}</main>
-    </div>
+<div>
+  <aside className="fixed left-0 top-0 h-screen w-64">
+    <Sidebar />
+  </aside>
+
+  <main className="ml-64">
+    {children}
+  </main>
+</div>
   );
 }

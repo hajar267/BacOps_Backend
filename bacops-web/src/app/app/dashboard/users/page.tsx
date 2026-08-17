@@ -11,9 +11,9 @@ import { Key } from 'lucide-react'; // add to your lucide import
 import { UpdatePasswordModal } from '@/components/users/UpdatePasswordModal';
 
 const ROLE_BADGE_STYLES: Record<string, string> = {
-  admin: 'bg-brand-primary/15 text-text-primary',
-  magasin: 'bg-brand-success/20 text-text-primary',
-  install: 'bg-brand-error/15 text-text-primary',
+  admin: 'bg-state-primary/15 text-text-primary',
+  magasin: 'bg-state-success/20 text-text-primary',
+  install: 'bg-state-error/15 text-text-primary',
 };
 
 export default function UsersPage() {

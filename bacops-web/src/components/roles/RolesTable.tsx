@@ -63,7 +63,7 @@ export function RolesTable({ roles, isLoading, onEdit, onDelete }: RolesTablePro
                       {role.permissions.map((perm) => (
                         <span
                           key={perm}
-                          className="px-2.5 py-1 rounded-full text-xs font-semibold bg-brand-success/15 text-text-primary"
+                          className="px-2.5 py-1 rounded-full text-xs font-semibold bg-state-success/15 text-text-primary"
                         >
                           {perm}
                         </span>

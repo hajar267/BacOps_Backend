@@ -95,7 +95,7 @@ function PvRow({ pv, onChanged }: { pv: PV; onChanged: () => void }) {
       </td>
       <td className="px-4 py-3">
         <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-          pv.isSigned ? 'bg-brand-success/15 text-brand-success' : 'bg-brand-error/15 text-brand-error'
+          pv.isSigned ? 'bg-state-success/15 text-state-success' : 'bg-state-error/15 text-state-error'
         }`}>
           {pv.isSigned ? 'Signé' : 'Non signé'}
         </span>
