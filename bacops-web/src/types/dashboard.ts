@@ -29,3 +29,18 @@ export interface DashboardStatsResponse {
   bacs: BacStats;
   rfids: RfidStats;
 }
+
+// Matches DashboardService::getBacsPerType() -> StockSummaryBac + bacType relation
+export interface BacTypeSummary {
+  id: number;
+  nature: string;
+  capacite: string;
+  variante: string | null;
+  matiere: string;
+  color: string | null;
+}
+
+export interface BacPerTypeItem {
+  enStock: number;
+  bacType: BacTypeSummary | null;
+}

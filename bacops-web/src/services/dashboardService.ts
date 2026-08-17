@@ -1,7 +1,11 @@
 // services/dashboardService.ts
 
 import { api } from '@/lib/axios';
-import { DashboardFilters, DashboardStatsResponse } from '@/types/dashboard';
+import {
+  BacPerTypeItem,
+  DashboardFilters,
+  DashboardStatsResponse,
+} from '@/types/dashboard';
 
 function buildParams(filters: DashboardFilters): Record<string, string> {
   const params: Record<string, string> = {};
@@ -18,5 +22,12 @@ export const dashboardService = {
   stats: async (filters: DashboardFilters = {}): Promise<DashboardStatsResponse> => {
     const response = await api.get('/dashboard/stats', { params: buildParams(filters) });
     return response.data;
+  },
+
+  // No filters here on purpose: DashboardController::bacsPerType() takes no Request,
+  // it always reads live from StockSummaryBac regardless of any date/type filters applied elsewhere.
+  bacsPerType: async (): Promise<BacPerTypeItem[]> => {
+    const response = await api.get('/dashboard/bacs-per-type');
+    return Array.isArray(response.data) ? response.data : [];
   },
 };

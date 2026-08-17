@@ -2,16 +2,26 @@
 
 import { useEffect, useState } from 'react';
 import { dashboardService } from '@/services/dashboardService';
-import { DashboardFilters as DashboardFiltersType, DashboardStatsResponse } from '@/types/dashboard';
+import {
+  BacPerTypeItem,
+  DashboardFilters as DashboardFiltersType,
+  DashboardStatsResponse,
+} from '@/types/dashboard';
+
 import { DashboardFilters } from '@/components/dashboard/admin/DashboardFilters';
 import { BacStatsCards } from '@/components/dashboard/admin/BacStatsCards';
 import { RfidStatsCards } from '@/components/dashboard/admin/RfidStatsCards';
+import { BacsPerTypeChart } from '@/components/dashboard/admin/BacsPerTypeChart';
+import { BacStatusDonutChart } from '@/components/dashboard/admin/BacStatusDonutChart';
 
 export default function DashboardPage() {
   const [filters, setFilters] = useState<DashboardFiltersType>({});
   const [data, setData] = useState<DashboardStatsResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [bacsPerType, setBacsPerType] = useState<BacPerTypeItem[]>([]);
+  const [isBacsPerTypeLoading, setIsBacsPerTypeLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -36,9 +46,29 @@ export default function DashboardPage() {
     };
   }, [filters]);
 
+  // Independent of `filters` — the bacs-per-type endpoint takes no query params.
+  useEffect(() => {
+    let cancelled = false;
+
+    dashboardService
+      .bacsPerType()
+      .then((res) => {
+        if (!cancelled) setBacsPerType(res);
+      })
+      .catch(() => {
+        if (!cancelled) setBacsPerType([]);
+      })
+      .finally(() => {
+        if (!cancelled) setIsBacsPerTypeLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <div className="mx-auto max-w-6xl p-6">
-      {/* Header row: greeting + filter trigger, same slot the mobile "Filtres" button occupies */}
       <div className="mb-6 flex items-start justify-between">
         <div>
           <h1 className="text-lg font-bold text-text-primary">Bonjour, Hajar</h1>
@@ -53,16 +83,17 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Stat cards — mirrors the mobile stack: Bacs, then RFID */}
       <div className="space-y-6">
         <BacStatsCards stats={data?.bacs ?? null} isLoading={isLoading} />
         <RfidStatsCards stats={data?.rfids ?? null} isLoading={isLoading} />
-      </div>
 
-      {/* Chart panels (Types de bacs, Statut, Bacs déployés, Valeur par statut)
-          go below the stat cards, same order as the mobile screens.
-          Not built yet — say the word and I'll do DashboardCharts.tsx next,
-          wired to bacTypeService.bacsPerType / installations / bacValue the same way. */}
+        <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
+          <BacsPerTypeChart data={bacsPerType} isLoading={isBacsPerTypeLoading} />
+          <BacStatusDonutChart stats={data?.bacs ?? null} isLoading={isLoading} />
+        </div>
+
+        {/* Remaining chart panels (Bacs déployés, Valeur par statut) go here next */}
+      </div>
     </div>
   );
 }
