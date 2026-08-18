@@ -4,15 +4,18 @@ import { useEffect, useState } from 'react';
 import { dashboardService } from '@/services/dashboardService';
 import {
   BacPerTypeItem,
+  BacValueSeriesResponse,
   DashboardFilters as DashboardFiltersType,
   DashboardStatsResponse,
+  InstallationsSeriesResponse,
 } from '@/types/dashboard';
-
 import { DashboardFilters } from '@/components/dashboard/admin/DashboardFilters';
 import { BacStatsCards } from '@/components/dashboard/admin/BacStatsCards';
 import { RfidStatsCards } from '@/components/dashboard/admin/RfidStatsCards';
 import { BacsPerTypeChart } from '@/components/dashboard/admin/BacsPerTypeChart';
 import { BacStatusDonutChart } from '@/components/dashboard/admin/BacStatusDonutChart';
+import { InstallationsAreaChart } from '@/components/dashboard/admin/InstallationsAreaChart';
+import { StackedValueAreaChart } from '@/components/dashboard/admin/StackedValueAreaChart';
 
 export default function DashboardPage() {
   const [filters, setFilters] = useState<DashboardFiltersType>({});
@@ -22,6 +25,12 @@ export default function DashboardPage() {
 
   const [bacsPerType, setBacsPerType] = useState<BacPerTypeItem[]>([]);
   const [isBacsPerTypeLoading, setIsBacsPerTypeLoading] = useState(true);
+
+  const [installations, setInstallations] = useState<InstallationsSeriesResponse | null>(null);
+  const [isInstallationsLoading, setIsInstallationsLoading] = useState(true);
+
+  const [bacValue, setBacValue] = useState<BacValueSeriesResponse | null>(null);
+  const [isBacValueLoading, setIsBacValueLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -39,6 +48,53 @@ export default function DashboardPage() {
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filters]);
+
+  // Also driven by `filters` — unlike bacsPerType, this endpoint respects from/to and the bac-type filters.
+  useEffect(() => {
+    let cancelled = false;
+
+    setIsInstallationsLoading(true);
+
+    dashboardService
+      .installations(filters)
+      .then((res) => {
+        if (!cancelled) setInstallations(res);
+      })
+      .catch(() => {
+        if (!cancelled) setInstallations(null);
+      })
+      .finally(() => {
+        if (!cancelled) setIsInstallationsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filters]);
+
+  // Also driven by `filters` — bucket range respects from/to, though each point's
+  // value is cumulative-to-date rather than period activity (see dashboardService.bacValue).
+  useEffect(() => {
+    let cancelled = false;
+
+    setIsBacValueLoading(true);
+
+    dashboardService
+      .bacValue(filters)
+      .then((res) => {
+        if (!cancelled) setBacValue(res);
+      })
+      .catch(() => {
+        if (!cancelled) setBacValue(null);
+      })
+      .finally(() => {
+        if (!cancelled) setIsBacValueLoading(false);
       });
 
     return () => {
@@ -92,7 +148,17 @@ export default function DashboardPage() {
           <BacStatusDonutChart stats={data?.bacs ?? null} isLoading={isLoading} />
         </div>
 
-        {/* Remaining chart panels (Bacs déployés, Valeur par statut) go here next */}
+        <InstallationsAreaChart
+          data={installations?.series ?? []}
+          granularity={installations?.granularity ?? 'monthly'}
+          isLoading={isInstallationsLoading}
+        />
+
+        <StackedValueAreaChart
+          data={bacValue?.series ?? []}
+          granularity={bacValue?.granularity ?? 'monthly'}
+          isLoading={isBacValueLoading}
+        />
       </div>
     </div>
   );

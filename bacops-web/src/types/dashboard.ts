@@ -44,3 +44,53 @@ export interface BacPerTypeItem {
   enStock: number;
   bacType: BacTypeSummary | null;
 }
+
+export interface InstallationsSeriesPoint {
+  label: string;
+  count: number;
+}
+ 
+export type DashboardGranularity = 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly';
+ 
+export interface InstallationsSeriesResponse {
+  granularity: DashboardGranularity;
+  from: string;
+  to: string;
+  series: InstallationsSeriesPoint[];
+}
+ 
+// Matches DashboardService::getInstallationsSeries()
+export type SeriesGranularity = 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly';
+ 
+export interface InstallationsSeriesPoint {
+  label: string;
+  count: number;
+}
+ 
+export interface InstallationsSeriesResponse {
+  granularity: SeriesGranularity;
+  from: string;
+  to: string;
+  series: InstallationsSeriesPoint[];
+}
+
+// Matches DashboardService::getBacValueSeries()
+export interface BacValueByStatus {
+  en_stock: number;
+  en_service: number;
+  en_reparation: number;
+  perdu: number;
+  mis_en_rebut: number;
+}
+ 
+export interface BacValueSeriesPoint {
+  label: string;
+  values: BacValueByStatus;
+}
+ 
+export interface BacValueSeriesResponse {
+  granularity: SeriesGranularity;
+  from: string;
+  to: string;
+  series: BacValueSeriesPoint[];
+}

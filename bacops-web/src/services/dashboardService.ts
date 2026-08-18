@@ -5,6 +5,8 @@ import {
   BacPerTypeItem,
   DashboardFilters,
   DashboardStatsResponse,
+  InstallationsSeriesResponse,
+  BacValueSeriesResponse,
 } from '@/types/dashboard';
 
 function buildParams(filters: DashboardFilters): Record<string, string> {
@@ -30,4 +32,20 @@ export const dashboardService = {
     const response = await api.get('/dashboard/bacs-per-type');
     return Array.isArray(response.data) ? response.data : [];
   },
+
+    // Respects from/to and the bac-type filters properly (whereBetween on installed_at),
+  // so this one *should* refetch whenever `filters` changes.
+  installations: async (filters: DashboardFilters = {}): Promise<InstallationsSeriesResponse> => {
+    const response = await api.get('/dashboard/installations', { params: buildParams(filters) });
+    return response.data;
+  },
+
+    // `from` shapes the bucket range shown, but each bucket's values are cumulative-to-date
+  // (see DashboardService::getBacValueSeries) — not activity strictly within the bucket.
+  bacValue: async (filters: DashboardFilters = {}): Promise<BacValueSeriesResponse> => {
+    const response = await api.get('/dashboard/bac-value', { params: buildParams(filters) });
+    return response.data;
+  },
+
+
 };
