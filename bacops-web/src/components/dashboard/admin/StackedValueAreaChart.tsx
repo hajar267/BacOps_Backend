@@ -12,7 +12,7 @@ interface StackedValueAreaChartProps {
 }
 
 const chartConfig = {
-  en_stock: { label: 'En stock', color: 'var(--color-brand-primary)' },
+  en_stock: { label: 'En stock', color: 'var(--color-brand-tertiary)' },
   en_service: { label: 'En service', color: 'var(--color-state-success)' },
   perdu: { label: 'Perdu / Rebut', color: 'var(--color-state-error)' },
 } satisfies ChartConfig;

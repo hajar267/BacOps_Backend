@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-brand-primary: #100e2e;
+  --color-brand-primary: #29246b;
   --color-brand-tertiary: #7FAFD4;
   --color-state-success: #8FC7A5;
   --color-state-error: #E79A9A;

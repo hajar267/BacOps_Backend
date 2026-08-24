@@ -1,0 +1,33 @@
+.bac-marker-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 1.5px solid #b4b2a9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.bac-marker-icon svg {
+  width: 16px;
+  height: 16px;
+  stroke: #6d7d8a;
+}
+
+.bac-marker-icon.active {
+  width: 40px;
+  height: 40px;
+  background: #29246b;
+  border-color: #29246b;
+}
+
+.bac-marker-icon.active svg {
+  stroke: #ffffff;
+}
+
+.leaflet-container {
+  font-family: inherit;
+  border-radius: 12px;
+}
