@@ -114,7 +114,8 @@ class DashboardService
 
     public function getStats(array $filters): array
     {
-        $toDate = $this->toEndOfDay($filters['to'] ?? null);
+        $to = !empty($filters['to']) ? Carbon::parse($filters['to']) : null;
+        $toDate = $this->toEndOfDay($to);
 
         $bacQuery = fn () => Bac::where('created_at', '<=', $toDate)
             ->tap(fn ($q) => $this->applyBacTypeFilter($q, $filters));
