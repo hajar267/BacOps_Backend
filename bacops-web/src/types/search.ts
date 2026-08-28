@@ -24,10 +24,12 @@ export interface BacSearchResult {
 }
 
 export interface BacHistoryItem {
-  type: 'stock' | 'installation';
-  date: string;
+  action: string;
+  previousState: string | null;
+  newState: string;
+  occurredAt: string;
+  agent: string | null;
   address: string | null;
-  person: string | null;
 }
 
 export interface BacLocation {
