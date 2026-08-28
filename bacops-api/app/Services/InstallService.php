@@ -21,6 +21,7 @@ class InstallService
         private BacStockService $bacService,
         private RfidStockService $rfidService,
         private PhotoUploadService $photoService,
+        private BacHistoryService $historyService,
     ) {}
 
     private function normalizeText($value): string
@@ -271,6 +272,17 @@ class InstallService
                     'location_lat' => $parsedLocalisation['latitude'],
                     'location_lng' => $parsedLocalisation['longitude'],
                 ]);
+
+                $this->historyService->record(
+                    bacId: $item['bacItem']->id,
+                    action: 'installation',
+                    previousState: $item['bacItem']->status,
+                    newState: 'en_service',
+                    agentId: $currentUserId,
+                    rfidId: $item['rfidItem']->id,
+                    installationId: $installationRow->id,
+                    occurredAt: $installedAt,
+                );
 
                 BacHasRFID::create([
                     'bac_id' => $item['bacItem']->id,

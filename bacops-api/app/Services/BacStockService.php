@@ -102,6 +102,23 @@ class BacStockService
 
                 Bac::insert($rows);
 
+                $bacIds = Bac::whereIn('serial_number', $serialNumbers)->pluck('id', 'serial_number');
+
+                $historyRows = array_map(fn ($serial) => [
+                    'bac_id' => $bacIds[$serial],
+                    'rfid_id' => null,
+                    'installation_id' => null,
+                    'action' => 'entree_stock',
+                    'previous_state' => null,
+                    'new_state' => 'en_stock',
+                    'agent_id' => $currentUserId,
+                    'occurred_at' => $now,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ], $serialNumbers);
+
+                BacHistoryEvent::insert($historyRows);
+
                 $summary = StockSummaryBac::where('bac_type_id', $bacType->id)->first();
 
                 if ($summary) {

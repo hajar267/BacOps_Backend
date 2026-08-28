@@ -4,6 +4,7 @@
 namespace App\Services;
 
 use App\Models\Bac;
+use App\Models\BacHistoryEvent;
 use App\Models\Commande;
 use App\Models\Installation;
 use App\Models\InstallationSession;
@@ -31,7 +32,6 @@ class DashboardService
 
     private function toStartOfWeek(Carbon $d): Carbon
     {
-        // Monday-start week, matching JS (day + 6) % 7 offset logic
         return $this->toStartOfDay($d)->startOfWeek(Carbon::MONDAY);
     }
 
@@ -83,8 +83,6 @@ class DashboardService
 
     private function computeGranularity(Carbon $from, Carbon $to): string
     {
-        $days = max(0, $from->diffInDays($to, false) * -1);
-        // diffInDays sign depends on order; ensure positive day count from->to
         $days = max(0, $from->copy()->startOfDay()->diffInDays($to->copy()->startOfDay()));
 
         if ($days <= 2) return 'hourly';
@@ -112,23 +110,38 @@ class DashboardService
         }
     }
 
+    private function applyBacTypeFilterOnHistory($query, array $filters): void
+    {
+        $bacTypeFilter = array_filter([
+            'nature' => $filters['nature'] ?? null,
+            'capacite' => $filters['capacite'] ?? null,
+            'matiere' => $filters['matiere'] ?? null,
+            'variante' => $filters['variante'] ?? null,
+        ], fn ($v) => $v !== null && $v !== 'Tous');
+
+        if (!empty($bacTypeFilter)) {
+            $query->whereHas('bac.bacType', function ($q) use ($bacTypeFilter) {
+                foreach ($bacTypeFilter as $field => $value) {
+                    $q->where($field, $value);
+                }
+            });
+        }
+    }
+
     public function getStats(array $filters): array
     {
-        $to = !empty($filters['to']) ? Carbon::parse($filters['to']) : null;
-        $toDate = $this->toEndOfDay($to);
+        $fromDate = !empty($filters['from'])
+            ? $this->toStartOfDay(Carbon::parse($filters['from']))
+            : Carbon::createFromTimestamp(0);
+        $toDate = !empty($filters['to'])
+            ? $this->toEndOfDay(Carbon::parse($filters['to']))
+            : now();
 
-        $bacQuery = fn () => Bac::where('created_at', '<=', $toDate)
-            ->tap(fn ($q) => $this->applyBacTypeFilter($q, $filters));
-
-        $total = $bacQuery()->count();
-        $enStock = $bacQuery()->where('status', 'en_stock')->count();
-        $enService = $bacQuery()->where('status', 'en_service')
-            ->whereHas('installations', function ($q) use ($toDate) {
-                $q->whereHas('session', fn ($s) => $s->where('installed_at', '<=', $toDate));
-            })->count();
-        $enReparation = $bacQuery()->where('status', 'en_reparation')->count();
-        $perdu = $bacQuery()->where('status', 'perdu')->count();
-        $misEnRebut = $bacQuery()->where('status', 'mis_en_rebut')->count();
+        $counts = BacHistoryEvent::whereBetween('occurred_at', [$fromDate, $toDate])
+            ->tap(fn ($q) => $this->applyBacTypeFilterOnHistory($q, $filters))
+            ->selectRaw('new_state, count(*) as total')
+            ->groupBy('new_state')
+            ->pluck('total', 'new_state');
 
         $rfidQuery = fn () => RFID::where('created_at', '<=', $toDate);
 
@@ -139,12 +152,12 @@ class DashboardService
 
         return [
             'bacs' => [
-                'total' => $total,
-                'en_stock' => $enStock,
-                'en_service' => $enService,
-                'en_reparation' => $enReparation,
-                'perdu' => $perdu,
-                'mis_en_rebut' => $misEnRebut,
+                'total' => $counts->sum(),
+                'en_stock' => $counts['en_stock'] ?? 0,
+                'en_service' => $counts['en_service'] ?? 0,
+                'en_reparation' => $counts['en_reparation'] ?? 0,
+                'perdu' => $counts['perdu'] ?? 0,
+                'mis_en_rebut' => $counts['mis_en_rebut'] ?? 0,
             ],
             'rfids' => [
                 'total' => $rfidTotal,
@@ -257,21 +270,41 @@ class DashboardService
             });
         }
 
-        $bacsWithPrice = $bacsQuery->with('commande:id,price')
-            ->get(['id', 'status', 'created_at', 'commande_id']);
+        $bacs = $bacsQuery->with('commande:id,price')->get(['id', 'commande_id']);
+        $priceByBacId = $bacs->mapWithKeys(fn ($bac) => [$bac->id => (float) ($bac->commande->price ?? 0)]);
+        $bacIds = $bacs->pluck('id');
+
+        // Chronological events per bac, used to reconstruct "status as of bucket X"
+        // instead of reading today's live status column.
+        $eventsByBac = BacHistoryEvent::whereIn('bac_id', $bacIds)
+            ->orderBy('occurred_at')
+            ->get(['bac_id', 'new_state', 'occurred_at'])
+            ->groupBy('bac_id')
+            ->map(fn ($group) => $group->values());
+
+        $pointer = [];
+        $currentState = [];
+        foreach ($bacIds as $id) {
+            $pointer[$id] = 0;
+            $currentState[$id] = null;
+        }
 
         $series = [];
         for ($cursor = $rangeStart->copy(); $cursor->lte($rangeEnd); $cursor = $this->addBucket($cursor, $granularity)) {
             $bucketEnd = $cursor->copy()->setTime(23, 59, 59, 999000);
 
-            $activeBacs = $bacsWithPrice->filter(fn ($b) => $b->created_at->lte($bucketEnd));
-
             $values = ['en_stock' => 0, 'en_service' => 0, 'en_reparation' => 0, 'perdu' => 0, 'mis_en_rebut' => 0];
 
-            foreach ($activeBacs as $bac) {
-                $price = (float) ($bac->commande->price ?? 0);
-                if (array_key_exists($bac->status, $values)) {
-                    $values[$bac->status] += $price;
+            foreach ($bacIds as $id) {
+                $events = $eventsByBac->get($id) ?? collect();
+
+                while ($pointer[$id] < $events->count() && $events[$pointer[$id]]->occurred_at->lte($bucketEnd)) {
+                    $currentState[$id] = $events[$pointer[$id]]->new_state;
+                    $pointer[$id]++;
+                }
+
+                if ($currentState[$id] !== null && array_key_exists($currentState[$id], $values)) {
+                    $values[$currentState[$id]] += $priceByBacId[$id] ?? 0;
                 }
             }
 

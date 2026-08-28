@@ -8,6 +8,7 @@ use App\Exceptions\SearchServiceException;
 use App\Models\Bac;
 use App\Models\BacHasRFID;
 use App\Models\Installation;
+use App\Models\BacHistoryEvent;
 
 class SearchService
 {
@@ -66,46 +67,30 @@ class SearchService
         ];
     }
 
-    public function getBacHistoryById(int $id): array
-    {
-        if ($id < 1) {
-            throw new SearchServiceException("L'identifiant du bac doit être un entier positif", 400);
-        }
-
-        $bac = Bac::with(['addedByUser', 'installations.session.agent'])->find($id);
-
-        if (! $bac) {
-            throw new SearchServiceException('Bac introuvable', 404);
-        }
-
-        $events = [
-            [
-                'type' => 'stock',
-                'date' => $bac->created_at,
-                'address' => null,
-                'person' => $bac->addedByUser->username,
-            ],
-        ];
-
-        foreach ($bac->installations as $installation) {
-            $events[] = [
-                'type' => 'installation',
-                'date' => $installation->session->installed_at,
-                'address' => $installation->session->address,
-                'person' => $installation->session->agent->username,
-            ];
-        }
-
-        usort($events, fn ($a, $b) => $b['date']->timestamp <=> $a['date']->timestamp);
-
-        return array_map(fn ($event) => [
-            'type' => $event['type'],
-            'date' => $event['date']->toIso8601String(),
-            'address' => $event['address'],
-            'person' => $event['person'],
-        ], $events);
+public function getBacHistoryById(int $id): array
+{
+    if ($id < 1) {
+        throw new SearchServiceException("L'identifiant du bac doit être un entier positif", 400);
     }
 
+    if (! Bac::where('id', $id)->exists()) {
+        throw new SearchServiceException('Bac introuvable', 404);
+    }
+
+    $events = BacHistoryEvent::where('bac_id', $id)
+        ->with(['agent:id,username', 'installation.session'])
+        ->orderByDesc('occurred_at')
+        ->get();
+
+    return $events->map(fn ($event) => [
+        'action' => $event->action,
+        'previousState' => $event->previous_state,
+        'newState' => $event->new_state,
+        'occurredAt' => $event->occurred_at->toIso8601String(),
+        'agent' => $event->agent?->username,
+        'address' => $event->installation?->session?->address,
+    ])->all();
+}
     public function getBacLocations(): array
     {
         $installations = Installation::whereNull('uninstalled_at')
