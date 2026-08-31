@@ -110,41 +110,24 @@ class DashboardService
         }
     }
 
-    private function applyBacTypeFilterOnHistory($query, array $filters): void
-    {
-        $bacTypeFilter = array_filter([
-            'nature' => $filters['nature'] ?? null,
-            'capacite' => $filters['capacite'] ?? null,
-            'matiere' => $filters['matiere'] ?? null,
-            'variante' => $filters['variante'] ?? null,
-        ], fn ($v) => $v !== null && $v !== 'Tous');
-
-        if (!empty($bacTypeFilter)) {
-            $query->whereHas('bac.bacType', function ($q) use ($bacTypeFilter) {
-                foreach ($bacTypeFilter as $field => $value) {
-                    $q->where($field, $value);
-                }
-            });
-        }
-    }
-
+    /**
+     * Pure snapshot — "what does the fleet look like right now."
+     * Intentionally ignores from/to: only the bac-type filters (nature,
+     * capacite, matiere, variante) affect this. Date-range filtering
+     * belongs to getBacValueSeries() below, not here.
+     */
     public function getStats(array $filters): array
     {
-        $fromDate = !empty($filters['from'])
-            ? $this->toStartOfDay(Carbon::parse($filters['from']))
-            : Carbon::createFromTimestamp(0);
-        $toDate = !empty($filters['to'])
-            ? $this->toEndOfDay(Carbon::parse($filters['to']))
-            : now();
+        $bacQuery = fn () => Bac::query()->tap(fn ($q) => $this->applyBacTypeFilter($q, $filters));
 
-        $counts = BacHistoryEvent::whereBetween('occurred_at', [$fromDate, $toDate])
-            ->tap(fn ($q) => $this->applyBacTypeFilterOnHistory($q, $filters))
-            ->selectRaw('new_state, count(*) as total')
-            ->groupBy('new_state')
-            ->pluck('total', 'new_state');
+        $total = $bacQuery()->count();
+        $enStock = $bacQuery()->where('status', 'en_stock')->count();
+        $enService = $bacQuery()->where('status', 'en_service')->count();
+        $enReparation = $bacQuery()->where('status', 'en_reparation')->count();
+        $perdu = $bacQuery()->where('status', 'perdu')->count();
+        $misEnRebut = $bacQuery()->where('status', 'mis_en_rebut')->count();
 
-        $rfidQuery = fn () => RFID::where('created_at', '<=', $toDate);
-
+        $rfidQuery = fn () => RFID::query();
         $rfidTotal = $rfidQuery()->count();
         $rfidDisponible = $rfidQuery()->whereIn('status', ['en_stock', 'disponible'])->count();
         $rfidEnService = $rfidQuery()->where('status', 'en_service')->count();
@@ -152,12 +135,12 @@ class DashboardService
 
         return [
             'bacs' => [
-                'total' => $counts->sum(),
-                'en_stock' => $counts['en_stock'] ?? 0,
-                'en_service' => $counts['en_service'] ?? 0,
-                'en_reparation' => $counts['en_reparation'] ?? 0,
-                'perdu' => $counts['perdu'] ?? 0,
-                'mis_en_rebut' => $counts['mis_en_rebut'] ?? 0,
+                'total' => $total,
+                'en_stock' => $enStock,
+                'en_service' => $enService,
+                'en_repara6tion' => $enReparation,
+                'perdu' => $perdu,
+                'mis_en_rebut' => $misEnRebut,
             ],
             'rfids' => [
                 'total' => $rfidTotal,
@@ -241,6 +224,11 @@ class DashboardService
         ];
     }
 
+    /**
+     * Range-aware — the only chart where from/to actually apply.
+     * Reconstructs each bac's status as of every bucket's end date from
+     * its own event history, instead of reading today's live status.
+     */
     public function getBacValueSeries(array $filters): array
     {
         $fromDate = !empty($filters['from'])
@@ -274,8 +262,6 @@ class DashboardService
         $priceByBacId = $bacs->mapWithKeys(fn ($bac) => [$bac->id => (float) ($bac->commande->price ?? 0)]);
         $bacIds = $bacs->pluck('id');
 
-        // Chronological events per bac, used to reconstruct "status as of bucket X"
-        // instead of reading today's live status column.
         $eventsByBac = BacHistoryEvent::whereIn('bac_id', $bacIds)
             ->orderBy('occurred_at')
             ->get(['bac_id', 'new_state', 'occurred_at'])

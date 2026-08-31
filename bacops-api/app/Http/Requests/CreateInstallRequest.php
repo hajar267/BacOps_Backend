@@ -41,7 +41,7 @@ class CreateInstallRequest extends FormRequest
             'installation.location' => ['sometimes', 'array'],
             'installation.location.arrondissement_id' => ['required_with:installation.location', 'integer', 'exists:arrondissements,id'],
             'installation.location.address' => ['required_with:installation.location', 'string', 'min:1'],
-            'installation.location.pointDeRegroupement' => ['sometimes', 'string'],
+            'installation.location.pointDeRegroupement' => ['sometimes', 'nullable', 'string'],
 
             'installation.beneficiary' => ['sometimes', 'array'],
             'installation.beneficiary.nom' => ['required_with:installation.beneficiary', 'string', 'min:1'],

@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\BacHistoryEvent;
-use Carbon\Carbon;
+use DateTimeInterface;
 
 class BacHistoryService
 {
@@ -15,7 +15,7 @@ class BacHistoryService
         ?int $agentId = null,
         ?int $rfidId = null,
         ?int $installationId = null,
-        ?Carbon $occurredAt = null,
+        ?DateTimeInterface $occurredAt = null,
     ): BacHistoryEvent {
         return BacHistoryEvent::create([
             'bac_id' => $bacId,

@@ -31,11 +31,10 @@ class AuthService
         $accessToken = JWTAuth::claims(['type' => 'access'])->fromUser($user);
 
         // Refresh token — temporarily swap TTL config, generate, then restore
-        $originalTtl = config('jwt.ttl');
-        config(['jwt.ttl' => config('jwt.refresh_ttl')]);
-        $refreshToken = JWTAuth::claims(['type' => 'refresh'])->fromUser($user);
-        config(['jwt.ttl' => $originalTtl]);
-
+    $originalTtl = JWTAuth::factory()->getTTL();
+    JWTAuth::factory()->setTTL(config('jwt.refresh_ttl'));
+    $refreshToken = JWTAuth::claims(['type' => 'refresh'])->fromUser($user);
+    JWTAuth::factory()->setTTL($originalTtl);
         return [
             'user' => [
                 'id' => $user->id,

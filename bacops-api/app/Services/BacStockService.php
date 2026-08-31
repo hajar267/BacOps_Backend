@@ -12,6 +12,7 @@ use App\Models\StockSummaryBac;
 use App\Models\Supplier;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
+use App\Models\BacHistoryEvent;
 
 class BacStockService
 {
@@ -67,7 +68,7 @@ class BacStockService
         $serialNumbers = [];
         for ($i = 0; $i < $input['quantite']; $i++) {
             $serial = $input['numero_debut'] + $i;
-            $serialNumbers[] = "{$prefix}-{$serial}";
+            $serialNumbers[] = "{$serial}-{$prefix}";
         }
 
         $conflicts = Bac::whereIn('serial_number', $serialNumbers)->pluck('serial_number')->all();
@@ -153,7 +154,7 @@ class BacStockService
             'commande_id' => $result['commandeId'],
             'bac_type_id' => $result['bacTypeId'],
             'quantite' => $input['quantite'],
-            'range' => "{$prefix}-{$input['numero_debut']} → {$prefix}-{$input['numero_fin']}",
+            'range' => "{$input['numero_debut']}-{$prefix} → {$input['numero_fin']}-{$prefix}",
         ];
     }
 
