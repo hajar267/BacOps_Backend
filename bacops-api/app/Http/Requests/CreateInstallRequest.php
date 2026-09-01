@@ -49,9 +49,8 @@ class CreateInstallRequest extends FormRequest
             'installation.beneficiary.cin' => ['required_with:installation.beneficiary', 'string', 'min:1'],
             'installation.beneficiary.telephone' => ['required_with:installation.beneficiary', 'string', 'min:1'],
             'installation.beneficiary.isFilled' => ['sometimes', 'boolean'],
-            'installation.beneficiary.signature1' => ['sometimes', 'string'],
-            'installation.beneficiary.signature2' => ['sometimes', 'string'],
-
+            'installation.beneficiary.signature1' => ['required_if:installation.beneficiary.isFilled,true', 'string'],
+            'installation.beneficiary.signature2' => ['required_if:installation.beneficiary.isFilled,true', 'string'],
             'installation.photo' => ['sometimes', 'nullable', 'string'],
             'installation.localisation' => ['sometimes', 'nullable', 'string'],
             'installation.installedAt' => ['sometimes', 'nullable', 'string'],

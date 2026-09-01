@@ -8,6 +8,7 @@ use App\Exceptions\InstallServiceException;
 use App\Models\Attachment;
 use App\Models\Bac;
 use App\Models\BacHasRFID;
+use App\Models\Decharge;
 use App\Models\Installation;
 use App\Models\InstallationSession;
 use App\Models\RFID;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 
 class InstallService
 {
+
     public function __construct(
         private BacStockService $bacService,
         private RfidStockService $rfidService,
@@ -153,6 +155,9 @@ class InstallService
 
         return ['results' => $results, 'canInstall' => $canInstallAll];
     }
+    
+    // ... constructor, normalizeText, parseLocalisation, findDuplicateValues,
+    //     updateBacSummary, updateRfidSummary, checkAvailability unchanged ...
 
     public function confirmInstallation(array $installation, int $currentUserId): array
     {
@@ -234,9 +239,30 @@ class InstallService
             }
         }
 
+        // ── Decharge: uploads happen before the transaction, same treatment as the install photo ──
+        $beneficiary = $installation['beneficiary'] ?? null;
+        $decharegeIsFilled = $beneficiary && ! empty($beneficiary['isFilled']);
+
+        $signatureBeneficiaireUrl = null;
+        $signatureAgentUrl = null;
+
+        if ($decharegeIsFilled) {
+            try {
+                if (! empty($beneficiary['signature1'])) {
+                    $signatureBeneficiaireUrl = $this->photoService->uploadSignature($beneficiary['signature1']);
+                }
+                if (! empty($beneficiary['signature2'])) {
+                    $signatureAgentUrl = $this->photoService->uploadSignature($beneficiary['signature2']);
+                }
+            } catch (\Exception $e) {
+                throw new InstallServiceException('Failed to upload signature', 500, $e->getMessage());
+            }
+        }
+
         $result = DB::transaction(function () use (
             $currentUserId, $sessionPoint, $parsedLocalisation, $sessionAddress, $sessionArrondissementId,
-            $installedAt, $photoUrl, $availability
+            $installedAt, $photoUrl, $availability,
+            $decharegeIsFilled, $beneficiary, $signatureBeneficiaireUrl, $signatureAgentUrl
         ) {
             $session = InstallationSession::create([
                 'agent_id' => $currentUserId,
@@ -256,6 +282,43 @@ class InstallService
                     'url' => $photoUrl,
                     'uploaded_by' => $currentUserId,
                 ]);
+            }
+
+            if ($decharegeIsFilled) {
+                $decharge = Decharge::create([
+                    'nom' => $this->normalizeText($beneficiary['nom'] ?? null),
+                    'prenom' => $this->normalizeText($beneficiary['prenom'] ?? null),
+                    'cin' => $this->normalizeText($beneficiary['cin'] ?? null) ?: null,
+                    'telephone' => $this->normalizeText($beneficiary['telephone'] ?? null),
+                    'created_by' => $currentUserId,
+                ]);
+
+                if ($signatureBeneficiaireUrl) {
+                    $attachment = Attachment::create([
+                        'ref_type' => 'decharge',
+                        'ref_id' => $decharge->id,
+                        'type' => 'signature_beneficiaire',
+                        'url' => $signatureBeneficiaireUrl,
+                        'uploaded_by' => $currentUserId,
+                    ]);
+                    $decharge->signature_beneficiaire_attachment_id = $attachment->id;
+                }
+
+                if ($signatureAgentUrl) {
+                    $attachment = Attachment::create([
+                        'ref_type' => 'decharge',
+                        'ref_id' => $decharge->id,
+                        'type' => 'signature_agent',
+                        'url' => $signatureAgentUrl,
+                        'uploaded_by' => $currentUserId,
+                    ]);
+                    $decharge->signature_agent_attachment_id = $attachment->id;
+                }
+
+                $decharge->save();
+
+                $session->decharge_id = $decharge->id;
+                $session->save();
             }
 
             $installations = [];

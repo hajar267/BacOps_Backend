@@ -21,6 +21,7 @@ class InstallationSession extends Model
         'address',
         'arrondissement_id',
         'installed_at',
+        'decharge_id',
     ];
 
     protected $casts = [
@@ -40,5 +41,10 @@ class InstallationSession extends Model
     public function arrondissement(): BelongsTo
     {
         return $this->belongsTo(Arrondissement::class);
+    }
+
+    public function decharge(): BelongsTo
+    {
+        return $this->belongsTo(Decharge::class);
     }
 }

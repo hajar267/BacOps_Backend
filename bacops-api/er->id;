@@ -1,0 +1,10 @@
+[90m= [39m[34;4mApp\Models\User[39;24m {#8902
+    [34musername[39m: [32m"[39m[32madmin[39m[32m"[39m,
+    [34memail[39m: [32m"[39m[32madmin@bacops.local[39m[32m"[39m,
+    [34mfirst_name[39m: [32m"[39m[32mAdmin[39m[32m"[39m,
+    [34mlast_name[39m: [32m"[39m[32mUser[39m[32m"[39m,
+    [34mis_active[39m: [36mtrue[39m,
+    #[33mpassword[39m: [32m"[39m\$[32m2y[39m\$[32m12[39m\$[32mn6lyfAQK7KW9nUczKzmWFuBmvARo5m7sbLMd9cJ52qYuHalXPPEy.[39m[32m"[39m,
+    [34mrole_id[39m: [35m1[39m,
+    [34mid[39m: [35m1[39m,
+  }

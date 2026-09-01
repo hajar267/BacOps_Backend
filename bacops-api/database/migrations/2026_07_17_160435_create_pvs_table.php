@@ -11,12 +11,12 @@ return new class extends Migration
         Schema::create('pvs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('admin_id')->constrained('users');
-            $table->string('contract_num');
+            $table->string('contract_num', 100);
             $table->string('pv_number')->unique();
             $table->timestamp('start_date')->nullable();
             $table->timestamp('end_date')->nullable();
-            $table->string('filter_capacite')->nullable();
-            $table->string('filter_matiere')->nullable();
+            $table->string('filter_capacite', 50)->nullable();
+            $table->string('filter_matiere', 50)->nullable();
             $table->string('signed_pdf_url')->nullable();
             $table->timestamp('signed_at')->nullable();
             $table->timestamp('created_at')->useCurrent();
