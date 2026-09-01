@@ -1,6 +1,6 @@
 // src/services/bacTypeService.ts
 import { api } from '@/lib/axios';
-import { BacTypeItem, CreateBacTypePayload } from '@/types/bacType';
+import { BacTypeItem, CreateBacTypePayload, UpdateBacTypePayload } from '@/types/bacType';
 
 interface RawBacType {
   id: number;
@@ -55,5 +55,15 @@ export const bacTypeService = {
   colors: async (): Promise<string[]> => {
     const response = await api.get('/bac-types/colors');
     return response.data.colors || response.data.data || response.data;
+  },
+
+    update: async (id: number, payload: UpdateBacTypePayload): Promise<BacTypeItem> => {
+    const response = await api.put(`/bac-types/bac-types/${id}`, payload);
+    const raw: RawBacType = response.data.bacType || response.data.data || response.data;
+    return normalize(raw);
+  },
+
+  remove: async (id: number): Promise<void> => {
+    await api.delete(`/bac-types/bac-types/${id}`);
   },
 };

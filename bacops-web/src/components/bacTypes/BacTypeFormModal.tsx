@@ -6,22 +6,24 @@ import { bacTypeService } from '@/services/bacTypeService';
 import { BacTypeItem, CreateBacTypePayload } from '@/types/bacType';
 
 interface BacTypeFormModalProps {
+  mode?: 'create' | 'edit';
+  initialData?: BacTypeItem;
   onClose: () => void;
   onSaved: (saved: BacTypeItem) => void;
 }
 
-export function BacTypeFormModal({ onClose, onSaved }: BacTypeFormModalProps) {
+export function BacTypeFormModal({ mode = 'create', initialData, onClose, onSaved }: BacTypeFormModalProps) {
   const [natures, setNatures] = useState<string[]>([]);
   const [capacites, setCapacites] = useState<string[]>([]);
   const [matieres, setMatieres] = useState<string[]>([]);
   const [colors, setColors] = useState<string[]>([]);
 
   const [form, setForm] = useState<CreateBacTypePayload>({
-    nature: '',
-    capacite: '',
-    variante: '',
-    matiere: '',
-    color: '',
+    nature: initialData?.nature ?? '',
+    capacite: initialData?.capacite ?? '',
+    variante: initialData?.variante ?? '',
+    matiere: initialData?.matiere ?? '',
+    color: initialData?.color ?? '',
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -66,7 +68,12 @@ export function BacTypeFormModal({ onClose, onSaved }: BacTypeFormModalProps) {
         matiere: form.matiere?.trim() || null,
         color: form.color?.trim() || null,
       };
-      const saved = await bacTypeService.create(payload);
+
+      const saved =
+        mode === 'edit' && initialData
+          ? await bacTypeService.update(initialData.id, payload)
+          : await bacTypeService.create(payload);
+
       onSaved(saved);
       onClose();
     } catch (err) {
@@ -80,7 +87,9 @@ export function BacTypeFormModal({ onClose, onSaved }: BacTypeFormModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-text-primary/45 p-4">
       <div className="w-full max-w-sm rounded-xl bg-white p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-text-primary">Nouveau type</h2>
+          <h2 className="text-base font-semibold text-text-primary">
+            {mode === 'edit' ? 'Modifier le type' : 'Nouveau type'}
+          </h2>
           <button onClick={onClose} className="text-text-secondary hover:text-text-primary">
             <X className="h-5 w-5" />
           </button>

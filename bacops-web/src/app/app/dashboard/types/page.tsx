@@ -11,6 +11,8 @@ export default function BacTypesPage() {
   const [bacTypes, setBacTypes] = useState<BacTypeItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<BacTypeItem | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
     bacTypeService
@@ -27,6 +29,19 @@ export default function BacTypesPage() {
       const exists = prev.some((t) => t.id === saved.id);
       return exists ? prev.map((t) => (t.id === saved.id ? saved : t)) : [...prev, saved];
     });
+  };
+
+  const handleDelete = async (item: BacTypeItem) => {
+    if (!confirm(`Supprimer le type "${item.nature}" ?`)) return;
+    setDeletingId(item.id);
+    try {
+      await bacTypeService.remove(item.id);
+      setBacTypes((prev) => prev.filter((t) => t.id !== item.id));
+    } catch {
+      alert('Échec de la suppression');
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -59,7 +74,12 @@ export default function BacTypesPage() {
       ) : (
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {bacTypes.map((item) => (
-            <BacTypeCard key={item.id} item={item} />
+            <BacTypeCard
+              key={item.id}
+              item={item}
+              onEdit={setEditingItem}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
       )}
@@ -72,6 +92,18 @@ export default function BacTypesPage() {
         <BacTypeFormModal
           onClose={() => setIsCreateOpen(false)}
           onSaved={handleSaved}
+        />
+      )}
+
+      {editingItem && (
+        <BacTypeFormModal
+          mode="edit"
+          initialData={editingItem}
+          onClose={() => setEditingItem(null)}
+          onSaved={(saved) => {
+            handleSaved(saved);
+            setEditingItem(null);
+          }}
         />
       )}
     </div>

@@ -22,3 +22,11 @@ export interface BacTypeSuggestions {
   matieres: string[];
   colors: string[];
 }
+
+export interface UpdateBacTypePayload {
+  nature?: string;
+  capacite?: string | null;
+  variante?: string | null;
+  matiere?: string | null;
+  color?: string | null;
+}
