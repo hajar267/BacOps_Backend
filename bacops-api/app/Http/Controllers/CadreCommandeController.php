@@ -30,4 +30,21 @@ class CadreCommandeController extends Controller
             'cadreCommande' => new CadreCommandeResource($cadreCommande),
         ], 201);
     }
+
+    public function update(UpdateCadreCommandeRequest $request, CadreCommande $cadreCommande): JsonResponse
+{
+    if ($request->has('label')) {
+        $cadreCommande->update(['label' => trim($request->validated('label'))]);
+    }
+
+    return response()->json(['cadreCommande' => new CadreCommandeResource($cadreCommande)]);
+}
+
+public function destroy(CadreCommande $cadreCommande): JsonResponse
+{
+    $cadreCommande->update(['is_active' => false]);
+
+    return response()->json(null, 204);
+}
+
 }

@@ -158,3 +158,28 @@ Route::post('/cadre-commandes', [CadreCommandeController::class, 'store'])
 //     ]);
 // });
 // ////////
+
+
+// Suppliers
+Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
+    Route::put('/suppliers/{supplier}', [SupplierController::class, 'update']);
+});
+Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
+    Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy']);
+});
+
+// Cadre Commande
+Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
+    Route::put('/cadre-commandes/{cadreCommande}', [CadreCommandeController::class, 'update']);
+});
+Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
+    Route::delete('/cadre-commandes/{cadreCommande}', [CadreCommandeController::class, 'destroy']);
+});
+
+// Bac Type
+Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
+    Route::put('/bac-types/bac-types/{bacType}', [BacTypeController::class, 'update']);
+});
+Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
+    Route::delete('/bac-types/bac-types/{bacType}', [BacTypeController::class, 'destroy']);
+});

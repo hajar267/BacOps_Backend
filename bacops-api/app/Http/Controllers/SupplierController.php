@@ -33,4 +33,24 @@ public function store(StoreSupplierRequest $request): JsonResponse
         'supplier' => new SupplierResource($supplier),
     ], 201);
 }
+
+public function update(UpdateSupplierRequest $request, Supplier $supplier): JsonResponse
+{
+    $supplier = $this->supplierService->update(
+        $supplier,
+        $request->validated(),
+        $request->file('logo')
+    );
+
+    return response()->json(['supplier' => new SupplierResource($supplier)]);
 }
+
+public function destroy(Supplier $supplier): JsonResponse
+{
+    $this->supplierService->delete($supplier);
+
+    return response()->json(null, 204);
+}
+
+}
+

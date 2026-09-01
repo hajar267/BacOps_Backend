@@ -8,6 +8,8 @@ use App\Http\Requests\CreateBacTypeRequest;
 use App\Services\BacTypeService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Models\BacType;
+use App\Http\Requests\UpdateBacTypeRequest;
 
 class BacTypeController extends Controller
 {
@@ -85,4 +87,27 @@ class BacTypeController extends Controller
             return response()->json($payload, $e->getStatusCode());
         }
     }
+
+    public function update(UpdateBacTypeRequest $request, BacType $bacType): JsonResponse
+{
+    try {
+        $bacType = $this->service->updateBacType($bacType, $request->validated());
+
+        return response()->json(['bacType' => $bacType]);
+    } catch (BacTypeServiceException $e) {
+        $payload = ['error' => $e->getMessage()];
+        if ($e->getConflicts()) {
+            $payload['conflicts'] = $e->getConflicts();
+        }
+        return response()->json($payload, $e->getStatusCode());
+    }
+}
+
+public function destroy(BacType $bacType): JsonResponse
+{
+    $bacType->update(['is_active' => false]);
+
+    return response()->json(null, 204);
+}
+
 }

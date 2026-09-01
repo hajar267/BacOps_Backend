@@ -108,4 +108,44 @@ class BacTypeService
 
         return $normalized;
     }
+
+    public function updateBacType(BacType $bacType, array $input): BacType
+{
+    $nature   = array_key_exists('nature', $input) ? trim($input['nature']) : $bacType->nature;
+    $capacite = array_key_exists('capacite', $input) ? $this->normalizeNullableText($input['capacite']) : $bacType->capacite;
+    $variante = array_key_exists('variante', $input) ? $this->normalizeNullableText($input['variante']) : $bacType->variante;
+    $matiere  = array_key_exists('matiere', $input) ? $this->normalizeNullableText($input['matiere']) : $bacType->matiere;
+    $color    = array_key_exists('color', $input) ? $this->normalizeNullableText($input['color']) : $bacType->color;
+
+    if ($nature === '') {
+        throw new BacTypeServiceException('Le champ nature ne doit pas être vide', 400);
+    }
+
+    $existing = BacType::where('nature', $nature)
+        ->where('capacite', $capacite)
+        ->where('variante', $variante)
+        ->where('matiere', $matiere)
+        ->where('color', $color)
+        ->where('id', '!=', $bacType->id)
+        ->first();
+
+    if ($existing) {
+        throw new BacTypeServiceException(
+            'Ce type de bac existe déjà',
+            409,
+            [$nature, $capacite ?? '', $variante ?? '', $matiere ?? '', $color ?? '']
+        );
+    }
+
+    $bacType->update([
+        'nature' => $nature,
+        'capacite' => $capacite,
+        'variante' => $variante,
+        'matiere' => $matiere,
+        'color' => $color,
+    ]);
+
+    return $bacType;
+}
+
 }
