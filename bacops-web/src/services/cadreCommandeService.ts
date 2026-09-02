@@ -1,4 +1,4 @@
-import { CadreCommandeItem, CreateCadreCommandePayload } from '@/types/cadreCommande';
+import { CadreCommandeItem, CreateCadreCommandePayload, UpdateCadreCommandePayload } from '@/types/cadreCommande';
 import { api } from '@/lib/axios';
 
 export const cadreCommandeService = {
@@ -10,5 +10,14 @@ export const cadreCommandeService = {
   create: async (payload: CreateCadreCommandePayload): Promise<CadreCommandeItem> => {
     const response = await api.post('/cadre-commandes', payload);
     return response.data.cadreCommande || response.data.data || response.data;
+  },
+
+  update: async (id: number, payload: UpdateCadreCommandePayload): Promise<CadreCommandeItem> => {
+    const response = await api.put(`/cadre-commandes/${id}`, payload);
+    return response.data.cadreCommande || response.data.data || response.data;
+  },
+
+  remove: async (id: number): Promise<void> => {
+    await api.delete(`/cadre-commandes/${id}`);
   },
 };

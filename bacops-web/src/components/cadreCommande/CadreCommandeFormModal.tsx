@@ -6,12 +6,14 @@ import { cadreCommandeService } from '@/services/cadreCommandeService';
 import { CadreCommandeItem } from '@/types/cadreCommande';
 
 interface CadreCommandeFormModalProps {
+  mode?: 'create' | 'edit';
+  initialData?: CadreCommandeItem;
   onClose: () => void;
   onSaved: (saved: CadreCommandeItem) => void;
 }
 
-export function CadreCommandeFormModal({ onClose, onSaved }: CadreCommandeFormModalProps) {
-  const [label, setLabel] = useState('');
+export function CadreCommandeFormModal({ mode = 'create', initialData, onClose, onSaved }: CadreCommandeFormModalProps) {
+  const [label, setLabel] = useState(initialData?.label ?? '');
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,7 +27,11 @@ export function CadreCommandeFormModal({ onClose, onSaved }: CadreCommandeFormMo
     setError(null);
 
     try {
-      const saved = await cadreCommandeService.create({ label: label.trim() });
+      const saved =
+        mode === 'edit' && initialData
+          ? await cadreCommandeService.update(initialData.id, { label: label.trim() })
+          : await cadreCommandeService.create({ label: label.trim() });
+
       onSaved(saved);
       onClose();
     } catch (err) {
@@ -39,7 +45,9 @@ export function CadreCommandeFormModal({ onClose, onSaved }: CadreCommandeFormMo
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-text-primary/45 p-4">
       <div className="w-full max-w-sm rounded-xl bg-white p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-text-primary">Nouveau cadre de commande</h2>
+          <h2 className="text-base font-semibold text-text-primary">
+            {mode === 'edit' ? 'Modifier le cadre de commande' : 'Nouveau cadre de commande'}
+          </h2>
           <button onClick={onClose} className="text-text-secondary hover:text-text-primary">
             <X className="h-5 w-5" />
           </button>

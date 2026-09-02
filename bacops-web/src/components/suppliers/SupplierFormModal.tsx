@@ -6,6 +6,8 @@ import { supplierService } from '@/services/suppliersService';
 import { SupplierItem } from '@/types/supplier';
 
 interface SupplierFormModalProps {
+  mode?: 'create' | 'edit';
+  initialData?: SupplierItem;
   onClose: () => void;
   onSaved: (saved: SupplierItem) => void;
 }
@@ -13,10 +15,10 @@ interface SupplierFormModalProps {
 const MAX_SIZE = 2 * 1024 * 1024; // 2MB
 const ALLOWED_TYPES = ['image/png', 'image/jpeg'];
 
-export function SupplierFormModal({ onClose, onSaved }: SupplierFormModalProps) {
-  const [nom, setNom] = useState('');
+export function SupplierFormModal({ mode = 'create', initialData, onClose, onSaved }: SupplierFormModalProps) {
+  const [nom, setNom] = useState(initialData?.nom ?? '');
   const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(initialData?.logoUrl ?? null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -49,7 +51,11 @@ export function SupplierFormModal({ onClose, onSaved }: SupplierFormModalProps) 
     setError(null);
 
     try {
-      const saved = await supplierService.create({ nom: nom.trim(), logo: logoFile });
+      const saved =
+        mode === 'edit' && initialData
+          ? await supplierService.update(initialData.id, { nom: nom.trim(), logo: logoFile })
+          : await supplierService.create({ nom: nom.trim(), logo: logoFile });
+
       onSaved(saved);
       onClose();
     } catch (err) {
@@ -63,7 +69,9 @@ export function SupplierFormModal({ onClose, onSaved }: SupplierFormModalProps) 
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-text-primary/45 p-4">
       <div className="w-full max-w-sm rounded-xl bg-white p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-text-primary">Nouveau fournisseur</h2>
+          <h2 className="text-base font-semibold text-text-primary">
+            {mode === 'edit' ? 'Modifier le fournisseur' : 'Nouveau fournisseur'}
+          </h2>
           <button onClick={onClose} className="text-text-secondary hover:text-text-primary">
             <X className="h-5 w-5" />
           </button>
@@ -94,7 +102,7 @@ export function SupplierFormModal({ onClose, onSaved }: SupplierFormModalProps) 
               className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-text-secondary hover:bg-background"
             >
               <Upload className="h-3.5 w-3.5" />
-              Choisir un fichier
+              {mode === 'edit' ? 'Remplacer le fichier' : 'Choisir un fichier'}
             </button>
             <p className="mt-1 text-[11px] text-text-secondary/70">PNG, JPG jusqu à 2 Mo</p>
           </div>

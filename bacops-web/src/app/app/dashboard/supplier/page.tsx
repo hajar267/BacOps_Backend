@@ -6,11 +6,14 @@ import { supplierService } from '@/services/suppliersService';
 import { SupplierItem } from '@/types/supplier';
 import { SupplierCard } from '@/components/suppliers/SupplierCard';
 import { SupplierFormModal } from '@/components/suppliers/SupplierFormModal';
+import { SupplierDeleteModal } from '@/components/suppliers/SupplierDeleteModal';
 
 export default function SuppliersPage() {
   const [suppliers, setSuppliers] = useState<SupplierItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<SupplierItem | null>(null);
+  const [deletingItem, setDeletingItem] = useState<SupplierItem | null>(null);
 
   useEffect(() => {
     supplierService
@@ -27,6 +30,10 @@ export default function SuppliersPage() {
       const exists = prev.some((s) => s.id === saved.id);
       return exists ? prev.map((s) => (s.id === saved.id ? saved : s)) : [...prev, saved];
     });
+  };
+
+  const handleDeleted = (id: number) => {
+    setSuppliers((prev) => prev.filter((s) => s.id !== id));
   };
 
   return (
@@ -57,7 +64,12 @@ export default function SuppliersPage() {
       ) : (
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {suppliers.map((item) => (
-            <SupplierCard key={item.id} item={item} />
+            <SupplierCard
+              key={item.id}
+              item={item}
+              onEdit={setEditingItem}
+              onDelete={setDeletingItem}
+            />
           ))}
         </div>
       )}
@@ -68,6 +80,26 @@ export default function SuppliersPage() {
 
       {isCreateOpen && (
         <SupplierFormModal onClose={() => setIsCreateOpen(false)} onSaved={handleSaved} />
+      )}
+
+      {editingItem && (
+        <SupplierFormModal
+          mode="edit"
+          initialData={editingItem}
+          onClose={() => setEditingItem(null)}
+          onSaved={(saved) => {
+            handleSaved(saved);
+            setEditingItem(null);
+          }}
+        />
+      )}
+
+      {deletingItem && (
+        <SupplierDeleteModal
+          item={deletingItem}
+          onClose={() => setDeletingItem(null)}
+          onDeleted={handleDeleted}
+        />
       )}
     </div>
   );

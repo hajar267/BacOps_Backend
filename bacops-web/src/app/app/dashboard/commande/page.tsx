@@ -6,11 +6,14 @@ import { cadreCommandeService } from '@/services/cadreCommandeService';
 import { CadreCommandeItem } from '@/types/cadreCommande';
 import { CadreCommandeCard } from '@/components/cadreCommande/CadreCommandeCard';
 import { CadreCommandeFormModal } from '@/components/cadreCommande/CadreCommandeFormModal';
+import { CadreCommandeDeleteModal } from '@/components/cadreCommande/CadreCommandeDeleteModal';
 
 export default function CadreCommandePage() {
   const [items, setItems] = useState<CadreCommandeItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<CadreCommandeItem | null>(null);
+  const [deletingItem, setDeletingItem] = useState<CadreCommandeItem | null>(null);
 
   useEffect(() => {
     cadreCommandeService
@@ -27,6 +30,10 @@ export default function CadreCommandePage() {
       const exists = prev.some((i) => i.id === saved.id);
       return exists ? prev.map((i) => (i.id === saved.id ? saved : i)) : [...prev, saved];
     });
+  };
+
+  const handleDeleted = (id: number) => {
+    setItems((prev) => prev.filter((i) => i.id !== id));
   };
 
   return (
@@ -55,7 +62,12 @@ export default function CadreCommandePage() {
       ) : (
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => (
-            <CadreCommandeCard key={item.id} item={item} />
+            <CadreCommandeCard
+              key={item.id}
+              item={item}
+              onEdit={setEditingItem}
+              onDelete={setDeletingItem}
+            />
           ))}
         </div>
       )}
@@ -67,6 +79,25 @@ export default function CadreCommandePage() {
       {isCreateOpen && (
         <CadreCommandeFormModal onClose={() => setIsCreateOpen(false)} onSaved={handleSaved} />
       )}
-    </div>
+
+      {editingItem && (
+        <CadreCommandeFormModal
+          mode="edit"
+          initialData={editingItem}
+          onClose={() => setEditingItem(null)}
+          onSaved={(saved) => {
+            handleSaved(saved);
+            setEditingItem(null);
+          }}
+        />
+      )}
+
+{deletingItem && (
+  <CadreCommandeDeleteModal
+    item={deletingItem}
+    onClose={() => setDeletingItem(null)}
+    onDeleted={handleDeleted}
+  />
+)}    </div>
   );
 }
