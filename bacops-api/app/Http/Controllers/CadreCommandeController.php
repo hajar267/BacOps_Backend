@@ -6,6 +6,7 @@ use App\Http\Resources\CadreCommandeResource;
 use App\Models\CadreCommande;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\StoreCadreCommandeRequest;
+use App\Http\Requests\UpdateCadreCommandeRequest;
 
 class CadreCommandeController extends Controller
 {
