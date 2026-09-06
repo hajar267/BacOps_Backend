@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Trash2, Upload } from 'lucide-react';
 import { pvService } from '@/services/pvService';
 import { PV } from '@/types/pv';
 
@@ -73,6 +74,7 @@ export default function PvListPage() {
 
 function PvRow({ pv, onChanged }: { pv: PV; onChanged: () => void }) {
   const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -84,6 +86,17 @@ function PvRow({ pv, onChanged }: { pv: PV; onChanged: () => void }) {
     } finally {
       setUploading(false);
       e.target.value = '';
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm(`Supprimer le PV ${pv.pvNumber} ?`)) return;
+    setDeleting(true);
+    try {
+      await pvService.delete(pv.id);
+      onChanged();
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -103,17 +116,28 @@ function PvRow({ pv, onChanged }: { pv: PV; onChanged: () => void }) {
       <td className="px-4 py-3">
         {pv.isSigned ? (
           <a
-  href={pv.signedPdfUrl!}
-  target="_blank"
-  rel="noopener noreferrer"
-  className="text-xs font-semibold px-3 py-1.5 border border-surface-border rounded-lg text-text-primary hover:bg-surface-bg"          >
+            href={pv.signedPdfUrl!}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-semibold px-3 py-1.5 border border-surface-border rounded-lg text-text-primary hover:bg-surface-bg inline-block"
+          >
             Voir
           </a>
         ) : (
-          <label className="text-xs font-semibold px-3 py-1.5 border border-surface-border rounded-lg text-text-primary hover:bg-surface-bg cursor-pointer">
-            {uploading ? '...' : 'Importer'}
-            <input type="file" accept=".pdf" className="hidden" onChange={handleImport} disabled={uploading} />
-          </label>
+          <div className="flex items-center gap-3">
+            <label className="text-xs font-semibold px-3 py-1.5 border border-surface-border rounded-lg text-text-primary hover:bg-surface-bg cursor-pointer">
+              {uploading ? '...' : 'Importer'}
+              <input type="file" accept=".pdf" className="hidden" onChange={handleImport} disabled={uploading} />
+            </label>
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="text-text-secondary hover:text-state-error disabled:opacity-50"
+              aria-label="Supprimer"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
         )}
       </td>
     </tr>

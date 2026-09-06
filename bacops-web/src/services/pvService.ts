@@ -25,4 +25,9 @@ export const pvService = {
     });
     return data;
   },
+
+    delete: async (id: number): Promise<void> => {
+    await api.delete(`/pv/${id}`);
+  },
+  
 };

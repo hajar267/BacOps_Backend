@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LogOut, LayoutDashboard, FileText, Users, Box, Tag,
   ListChecks, Settings, User, Lock, ChevronDown, 
-  ChevronRight, Shield, MapPinned, Truck
+  ChevronRight, Shield, MapPinned, Truck, FolderArchive
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getInitials } from '@/utils/initials';
@@ -15,6 +15,7 @@ import { NAV_ITEMS, NavEntry } from '@/constants/navigation';
 const ICONS: Record<string, React.ElementType> = {
   chart: LayoutDashboard,
   file: FileText,
+  files: FolderArchive,
   users: Users,
   box: Box,
   tag: Tag,

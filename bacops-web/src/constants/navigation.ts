@@ -54,6 +54,7 @@ export const NAV_ITEMS: Record<string, NavEntry[]> = {
         { label: 'Gestion des arronds', href: '/app/dashboard/arrond', icon: 'map' },
         { label: 'Fournisseurs', href: '/app/dashboard/supplier', icon: 'truck' },
         { label: 'Cadre de commande', href: '/app/dashboard/commande', icon: 'tag' },
+        { label: 'Decharges', href: '/app/dashboard/decharges', icon: 'files' },
       ],
     },
   ],
