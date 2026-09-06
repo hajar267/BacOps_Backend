@@ -133,4 +133,16 @@ class PVService
 
         return $min ? Carbon::parse($min) : Carbon::createFromTimestamp(0);
     }
+
+    public function deleteUnsignedPv(int $pvId): void
+{
+    $pv = PV::findOrFail($pvId);
+
+    if ($pv->signed_at !== null) {
+        throw new \RuntimeException('Cannot delete a signed PV.');
+    }
+
+    $pv->delete();
+}
+
 }

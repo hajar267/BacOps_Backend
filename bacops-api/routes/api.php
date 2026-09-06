@@ -19,6 +19,7 @@ use App\Http\Controllers\PrefectureController;
 use App\Http\Controllers\ArrondissementController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\CadreCommandeController;
+use App\Http\Controllers\DechargeController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -33,6 +34,7 @@ Route::middleware(['auth:api', 'permission:stock:read'])->group(function () {
     Route::get('/bac-types/matieres', [BacTypeController::class, 'matieres']);
     Route::get('/bac-types/colors', [BacTypeController::class, 'colors']);
     Route::get('/bac-types/bac-types', [BacTypeController::class, 'index']);
+    Route::get('/decharges', [DechargeController::class, 'index']);
 });
 
 Route::post('/bac-types/bac-types', [BacTypeController::class, 'store'])
@@ -63,6 +65,9 @@ Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
 
 Route::post('/pv/download', [PVController::class, 'store'])
     ->middleware(['auth:api', 'permission:admin:create']);
+
+Route::delete('/pv/{id}', [PVController::class, 'destroy'])
+    ->middleware(['auth:api', 'permission:admin:update']);
 
 Route::post('/pv/{id}/signed', [PVController::class, 'uploadSigned'])
     ->middleware(['auth:api', 'permission:admin:create']);

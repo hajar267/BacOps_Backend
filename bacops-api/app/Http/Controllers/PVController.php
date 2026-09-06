@@ -69,4 +69,19 @@ class PVController extends Controller
             return response()->json(['error' => 'Internal Server Error', 'message' => 'Failed to upload signed PV'], 500);
         }
     }
+
+    public function destroy(int $id): JsonResponse
+{
+    try {
+        $this->service->deleteUnsignedPv((int) $id);
+
+        return response()->json(null, 204);
+    } catch (\RuntimeException $e) {
+        return response()->json(['error' => 'Conflict', 'message' => $e->getMessage()], 409);
+    } catch (\Exception $e) {
+        \Log::error('PV deletion failed: ' . $e->getMessage(), ['exception' => $e]);
+        return response()->json(['error' => 'Internal Server Error', 'message' => 'Failed to delete PV'], 500);
+    }
+}
+
 }
