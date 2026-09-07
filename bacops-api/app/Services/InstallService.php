@@ -369,12 +369,13 @@ class InstallService
                 ];
             }
 
-            return ['sessionId' => $session->id, 'installations' => $installations];
+            return ['sessionId' => $session->id, 'dechargeId' => $decharge->id ?? null, 'installations' => $installations];
         });
 
         return [
             'message' => 'Installation saved successfully',
             'sessionId' => $result['sessionId'],
+            'dechargeId' => $result['dechargeId'],
             'installations' => $result['installations'],
         ];
     }
