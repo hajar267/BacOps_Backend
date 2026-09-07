@@ -16,35 +16,30 @@ api.interceptors.request.use((config) => {
 });
 
 // Handle expired access tokens with a silent refresh
-let isRefreshing = false;
-let pendingQueue: Array<() => void> = [];
+let refreshPromise: Promise<void> | null = null;
 
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !originalRequest.skipAuthRefresh
+    ) {
       originalRequest._retry = true;
 
-      if (isRefreshing) {
-        // Queue this request until the refresh finishes
-        return new Promise((resolve) => {
-          pendingQueue.push(() => resolve(api(originalRequest)));
-        });
-      }
-
-      isRefreshing = true;
       try {
-        // await useAuthStore.getState().refreshAccessToken();
-        pendingQueue.forEach((cb) => cb());
-        pendingQueue = [];
+        refreshPromise ??= useAuthStore.getState().refreshAccessToken();
+        await refreshPromise;
         return api(originalRequest);
       } catch (refreshError) {
-        // useAuthStore.getState().logout();
+        useAuthStore.getState().logout();
         return Promise.reject(refreshError);
       } finally {
-        isRefreshing = false;
+        refreshPromise = null;
       }
     }
 

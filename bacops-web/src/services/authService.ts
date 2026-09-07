@@ -8,7 +8,9 @@ export const authService = {
   },
 
 refresh: async (refreshToken: string): Promise<{ accessToken: string }> => {
-  const { data } = await api.post('/auth/refresh', { refresh_token: refreshToken });
+  const { data } = await api.post('/auth/refresh', { refreshToken }, {
+    skipAuthRefresh: true,
+  });
   return data;
 },
 //   logout: async (): Promise<void> => {

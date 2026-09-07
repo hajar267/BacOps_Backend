@@ -11,10 +11,10 @@ export default function DechargeListPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (search: string) => {
     setLoading(true);
     try {
-      const data = await dechargeService.list();
+      const data = await dechargeService.list(search || undefined);
       setDecharges(data);
     } catch {
       setDecharges([]);
@@ -25,23 +25,23 @@ export default function DechargeListPage() {
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
-      void load();
-    }, 0);
+      void load(searchTerm);
+    }, 350);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [load]);
+  }, [searchTerm, load]);
 
   return (
-    <div className="w-full mx-auto p-8 ">
-      <div className="mb-6 ">
+    <div className="w-full mx-auto p-8">
+      <div className="mb-6">
         <h1 className="text-2xl font-bold text-text-primary">Décharges</h1>
         <p className="mt-1 text-sm text-text-secondary">Consulter les décharges bénéficiaires</p>
       </div>
 
       <div className="relative mb-4">
-        <Search className="w-4 h-4 text-text-secondary absolute left-3 top-1/2 -translate-y-1/2 " />
+        <Search className="w-4 h-4 text-text-secondary absolute left-3 top-1/2 -translate-y-1/2" />
         <input
           type="text"
           value={searchTerm}

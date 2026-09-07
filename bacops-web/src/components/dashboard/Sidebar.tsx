@@ -6,7 +6,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LogOut, LayoutDashboard, FileText, Users, Box, Tag,
   ListChecks, Settings, User, Lock, ChevronDown, 
-  ChevronRight, Shield, MapPinned, Truck, FolderArchive
+  ChevronRight, Shield, MapPinned, Truck, FolderArchive,
+  Search
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getInitials } from '@/utils/initials';
@@ -27,6 +28,7 @@ const ICONS: Record<string, React.ElementType> = {
   map: MapPinned,
   truck: Truck,
   layoutdashboard: LayoutDashboard,
+  search: Search,
 };
 
 export function Sidebar() {

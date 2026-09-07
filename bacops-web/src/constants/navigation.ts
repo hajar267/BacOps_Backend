@@ -28,6 +28,14 @@ export const NAV_ITEMS: Record<string, NavEntry[]> = {
   ],
 },
     {
+  type: 'group',
+  label: 'Rechercher',
+  icon: 'search',
+  items: [
+    { label: 'Rechercher', href: '/app/dashboard/search', icon: 'search' },
+  ],
+},
+    {
       type: 'group',
       label: 'Mon compte',
       icon: 'user',
