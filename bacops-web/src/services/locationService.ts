@@ -1,18 +1,27 @@
 import { api } from '@/lib/axios';
 import { ArrondissementListItem, CreateArrondissementPayload, UpdateArrondissementPayload } from '@/types/location';
 
+interface RawArrondissement {
+  id?: number;
+  name?: string;
+  ville?: { id?: number; name?: string } | null;
+  prefecture?: { id?: number; name?: string } | null;
+}
+
 export const locationService = {
   list: async (): Promise<ArrondissementListItem[]> => {
     const { data } = await api.get('/arrondissements');
     const items = data.data || data;
-    return items.map((raw: any) => ({
+    return items.map((raw: RawArrondissement) => ({
       id: raw.id,
       name: raw.name,
-      prefectureVille: {
+      ville: {
         id: raw.ville?.id ?? 0,
-        prefecture: raw.prefecture?.name ?? null,
-        ville: raw.ville?.name ?? '',
+        name: raw.ville?.name ?? '',
       },
+      prefecture: raw.prefecture
+        ? { id: raw.prefecture.id, name: raw.prefecture.name }
+        : null,
     }));
   },
 
@@ -24,11 +33,13 @@ export const locationService = {
     return {
       id: raw.id,
       name: raw.name,
-      prefectureVille: {
+      ville: {
         id: raw.ville?.id ?? 0,
-        prefecture: raw.prefecture?.name ?? null,
-        ville: raw.ville?.name ?? '',
+        name: raw.ville?.name ?? '',
       },
+      prefecture: raw.prefecture
+        ? { id: raw.prefecture.id, name: raw.prefecture.name }
+        : null,
     };
   },
 
@@ -41,11 +52,13 @@ export const locationService = {
     return {
       id: raw.id,
       name: raw.name,
-      prefectureVille: {
+      ville: {
         id: raw.ville?.id ?? 0,
-        prefecture: raw.prefecture?.name ?? null,
-        ville: raw.ville?.name ?? '',
+        name: raw.ville?.name ?? '',
       },
+      prefecture: raw.prefecture
+        ? { id: raw.prefecture.id, name: raw.prefecture.name }
+        : null,
     };
   },
 

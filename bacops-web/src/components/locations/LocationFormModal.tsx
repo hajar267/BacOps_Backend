@@ -18,9 +18,9 @@ export function LocationFormModal({
 }: LocationFormModalProps) {
   const isEditMode = !!arrondissement;
 
-  const [ville, setVille] = useState(arrondissement?.prefectureVille.ville ?? '');
+  const [ville, setVille] = useState(arrondissement?.ville.name ?? '');
   const [prefecture, setPrefecture] = useState(
-    arrondissement?.prefectureVille.prefecture ?? ''
+    arrondissement?.prefecture?.name ?? ''
   );
   const [name, setName] = useState(arrondissement?.name ?? '');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,8 +42,8 @@ export function LocationFormModal({
     setIsSubmitting(true);
     try {
       const payload = {
-        ville: ville.trim(),
-        prefecture: prefecture.trim() || null,
+        ville_id: arrondissement?.ville.id ?? 0,
+        prefecture_id: arrondissement?.prefecture?.id ?? null,
         name: name.trim(),
       };
 
@@ -53,7 +53,7 @@ export function LocationFormModal({
 
       onSaved(result);
       onClose();
-    } catch (err) {
+    } catch {
       setError("Une erreur est survenue lors de l'enregistrement.");
     } finally {
       setIsSubmitting(false);

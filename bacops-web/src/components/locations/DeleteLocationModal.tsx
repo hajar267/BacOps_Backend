@@ -26,7 +26,7 @@ export function DeleteLocationModal({
       await locationService.delete(arrondissement.id);
       onDeleted(arrondissement.id);
       onClose();
-    } catch (err) {
+    } catch {
       setError("Suppression impossible — vérifiez qu'aucune installation ne l'utilise.");
     } finally {
       setIsDeleting(false);
@@ -52,7 +52,7 @@ export function DeleteLocationModal({
         <p className="text-sm text-text-secondary mb-6">
           Voulez-vous vraiment supprimer{' '}
           <span className="font-semibold text-text-primary">{arrondissement.name}</span>
-          {' '}({arrondissement.prefectureVille.ville}) ? Cette action est irréversible.
+          {' '}({arrondissement.ville.name}) ? Cette action est irréversible.
         </p>
 
         {error && (

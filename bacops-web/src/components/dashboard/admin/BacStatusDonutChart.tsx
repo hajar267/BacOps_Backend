@@ -1,6 +1,6 @@
 'use client';
 
-import { Cell, Pie, PieChart } from 'recharts';
+import { Cell, Pie, PieChart, type PieLabelRenderProps } from 'recharts';
 import { ChartConfig, ChartContainer, ChartTooltip } from '@/components/ui/chart';
 import { BacStats } from '@/types/dashboard';
 
@@ -37,11 +37,11 @@ export function BacStatusDonutChart({ stats, isLoading }: BacStatusDonutChartPro
       </div>
 
       {isLoading ? (
-        <div className="h-[220px] w-full animate-pulse rounded-lg bg-background" />
+        <div className="h-55 w-full animate-pulse rounded-lg bg-background" />
       ) : total === 0 ? (
         <p className="py-10 text-center text-sm text-text-secondary">Aucune donnée disponible</p>
       ) : (
-        <ChartContainer config={chartConfig} className="mx-auto h-[220px] w-full">
+        <ChartContainer config={chartConfig} className="mx-auto h-55 w-full">
           <PieChart>
             <ChartTooltip
               cursor={false}
@@ -70,9 +70,15 @@ export function BacStatusDonutChart({ stats, isLoading }: BacStatusDonutChartPro
               outerRadius={85}
               paddingAngle={2}
               labelLine
-              label={({ status, value }: { status: StatusKey; value: number }) =>
-                `${chartConfig[status].label} ${percentageOf(value)}%`
-              }
+              label={(props: PieLabelRenderProps) => {
+                const status = props.payload?.status as StatusKey | undefined;
+
+                if (!status || !(status in chartConfig)) {
+                  return null;
+                }
+
+                return `${chartConfig[status].label} ${percentageOf(props.value)}%`;
+              }}
             >
               {data.map((entry) => (
                 <Cell

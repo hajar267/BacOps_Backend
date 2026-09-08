@@ -35,14 +35,14 @@ export const NAV_ITEMS: Record<string, NavEntry[]> = {
     { label: 'Rechercher', href: '/app/dashboard/search', icon: 'search' },
   ],
 },
-    {
-      type: 'group',
-      label: 'Mon compte',
-      icon: 'user',
-      items: [
-        { label: 'Changer mot de passe', href: '/app/dashboard/account/password', icon: 'lock' },
-      ],
-    },
+    // {
+    //   type: 'group',
+    //   label: 'Mon compte',
+    //   icon: 'user',
+    //   items: [
+    //     { label: 'Changer mot de passe', href: '/app/dashboard/account/password', icon: 'lock' },
+    //   ],
+    // },
     {
       type: 'group',
       label: 'Utilisateurs',
