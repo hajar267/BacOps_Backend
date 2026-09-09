@@ -6,13 +6,14 @@ import { bacTypeService } from '@/services/bacTypeService';
 import { BacTypeItem } from '@/types/bacType';
 import { BacTypeCard } from '@/components/bacTypes/BacTypeCard';
 import { BacTypeFormModal } from '@/components/bacTypes/BacTypeFormModal';
+import { DeleteConfirmModal } from '@/components/locations/DeleteConfirmModal';
 
 export default function BacTypesPage() {
   const [bacTypes, setBacTypes] = useState<BacTypeItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<BacTypeItem | null>(null);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deletingItem, setDeletingItem] = useState<BacTypeItem | null>(null);
 
   useEffect(() => {
     bacTypeService
@@ -31,17 +32,11 @@ export default function BacTypesPage() {
     });
   };
 
-  const handleDelete = async (item: BacTypeItem) => {
-    if (!confirm(`Supprimer le type "${item.nature}" ?`)) return;
-    setDeletingId(item.id);
-    try {
-      await bacTypeService.remove(item.id);
-      setBacTypes((prev) => prev.filter((t) => t.id !== item.id));
-    } catch {
-      alert('Échec de la suppression');
-    } finally {
-      setDeletingId(null);
-    }
+  const handleDelete = async () => {
+    if (!deletingItem) return;
+
+    await bacTypeService.remove(deletingItem.id);
+    setBacTypes((prev) => prev.filter((t) => t.id !== deletingItem.id));
   };
 
   return (
@@ -78,7 +73,7 @@ export default function BacTypesPage() {
               key={item.id}
               item={item}
               onEdit={setEditingItem}
-              onDelete={handleDelete}
+              onDelete={setDeletingItem}
             />
           ))}
         </div>
@@ -104,6 +99,15 @@ export default function BacTypesPage() {
             handleSaved(saved);
             setEditingItem(null);
           }}
+        />
+      )}
+
+      {deletingItem && (
+        <DeleteConfirmModal
+          title="Supprimer le type de bac"
+          itemLabel={deletingItem.nature}
+          onClose={() => setDeletingItem(null)}
+          onConfirm={handleDelete}
         />
       )}
     </div>

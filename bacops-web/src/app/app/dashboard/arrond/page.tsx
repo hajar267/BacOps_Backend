@@ -11,7 +11,6 @@ import { VilleFormModal } from '@/components/locations/VilleFormModal';
 import { PrefectureFormModal } from '@/components/locations/PrefectureFormModal';
 import { ArrondissementFormModal } from '@/components/locations/ArrondissementFormModal';
 import { DeleteConfirmModal } from '@/components/locations/DeleteConfirmModal';
-import { villeService as vSvc } from '@/services/villeService';
 
 const TAB_CONFIG = {
   villes: { label: 'Ajouter une ville', placeholder: 'Rechercher une ville' },

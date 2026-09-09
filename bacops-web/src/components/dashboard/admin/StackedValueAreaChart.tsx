@@ -17,10 +17,10 @@ const chartConfig = {
   perdu: { label: 'Perdu / Rebut', color: 'var(--color-state-error)' },
 } satisfies ChartConfig;
 
-// Stack order: bottom -> top. Kept separate from chartConfig's key order
-// so the render/legend order and the visual stacking order can differ if needed.
-const seriesOrder = ['en_stock', 'en_service', 'perdu'] as const;
-type SeriesKey = (typeof seriesOrder)[number];
+// Stack order: bottom -> top. Keep the zero-valued red series at the bottom.
+const stackOrder = ['perdu', 'en_stock', 'en_service'] as const;
+const displayOrder = ['en_stock', 'en_service', 'perdu'] as const;
+type SeriesKey = (typeof stackOrder)[number];
 
 function formatMAD(value: number): string {
   return `${new Intl.NumberFormat('fr-MA', { maximumFractionDigits: 0 }).format(value)} MAD`;
@@ -45,15 +45,15 @@ export function StackedValueAreaChart({ data, granularity, isLoading }: StackedV
       </div>
 
       {isLoading ? (
-        <div className="h-[240px] w-full animate-pulse rounded-lg bg-background" />
+        <div className="h-60 w-full animate-pulse rounded-lg bg-background" />
       ) : chartData.length === 0 || isEmpty ? (
         <p className="py-10 text-center text-sm text-text-secondary">Aucune donnée disponible</p>
       ) : (
         <>
-          <ChartContainer config={chartConfig} className="h-[240px] w-full">
+          <ChartContainer config={chartConfig} className="h-60 w-full">
             <AreaChart data={chartData} margin={{ left: -12, right: 12, top: 8 }}>
               <defs>
-                {seriesOrder.map((key) => (
+                {stackOrder.map((key) => (
                   <linearGradient key={key} id={`fill-${key}`} x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor={chartConfig[key].color} stopOpacity={0.55} />
                     <stop offset="95%" stopColor={chartConfig[key].color} stopOpacity={0.08} />
@@ -83,14 +83,12 @@ export function StackedValueAreaChart({ data, granularity, isLoading }: StackedV
                   const total = payload.reduce((sum, p) => sum + (p.value as number), 0);
 
                   return (
-                    <div className="min-w-[180px] rounded-lg border border-border bg-white px-3 py-2 text-xs shadow-sm">
+                    <div className="min-w-45 rounded-lg border border-border bg-white px-3 py-2 text-xs shadow-sm">
                       <p className="mb-1.5 font-medium text-text-primary">
                         {formatPeriodLabel(label as string, granularity)}
                       </p>
                       <div className="space-y-1">
-                        {seriesOrder
-                          .slice()
-                          .reverse()
+                        {displayOrder
                           .map((key) => {
                             const entry = payload.find((p) => p.dataKey === key);
                             if (!entry) return null;
@@ -118,7 +116,7 @@ export function StackedValueAreaChart({ data, granularity, isLoading }: StackedV
                   );
                 }}
               />
-              {seriesOrder.map((key) => (
+              {stackOrder.map((key) => (
                 <Area
                   key={key}
                   type="monotone"
@@ -134,7 +132,7 @@ export function StackedValueAreaChart({ data, granularity, isLoading }: StackedV
 
           {/* Legend: what each color means, since the stack makes color the only cue */}
           <div className="mt-3 flex flex-wrap gap-4 border-t border-border pt-3">
-            {seriesOrder.map((key) => (
+            {displayOrder.map((key) => (
               <div key={key} className="flex items-center gap-1.5 text-xs text-text-secondary">
                 <span
                   className="h-2 w-2 rounded-full"

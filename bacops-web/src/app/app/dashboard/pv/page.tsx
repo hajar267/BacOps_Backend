@@ -2,13 +2,15 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Trash2, Upload } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { pvService } from '@/services/pvService';
 import { PV } from '@/types/pv';
+import { DeleteConfirmModal } from '@/components/locations/DeleteConfirmModal';
 
 export default function PvListPage() {
   const [pvs, setPvs] = useState<PV[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingPv, setDeletingPv] = useState<PV | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -33,11 +35,11 @@ export default function PvListPage() {
   }, [load]);
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-lg font-bold text-text-primary">PV</h1>
-          <p className="text-sm text-text-secondary">Gérer les procès-verbaux</p>
+          <h1 className="text-2xl font-bold text-text-primary">PV</h1>
+          <p className="text-sm text-text-secondary mt-1">Gérer les procès-verbaux</p>
         </div>
         <Link
           href="/app/dashboard/pv/generate"
@@ -63,18 +65,39 @@ export default function PvListPage() {
             ) : pvs.length === 0 ? (
               <tr><td colSpan={4} className="text-center py-8 text-text-secondary">Aucun PV généré pour l&apos;instant</td></tr>
             ) : (
-              pvs.map((pv) => <PvRow key={pv.id} pv={pv} onChanged={load} />)
+              pvs.map((pv) => (
+                <PvRow key={pv.id} pv={pv} onChanged={load} onDelete={setDeletingPv} />
+              ))
             )}
           </tbody>
         </table>
       </div>
+
+      {deletingPv && (
+        <DeleteConfirmModal
+          title="Supprimer le PV"
+          itemLabel={deletingPv.pvNumber}
+          onClose={() => setDeletingPv(null)}
+          onConfirm={async () => {
+            await pvService.delete(deletingPv.id);
+            setPvs((prev) => prev.filter((pv) => pv.id !== deletingPv.id));
+          }}
+        />
+      )}
     </div>
   );
 }
 
-function PvRow({ pv, onChanged }: { pv: PV; onChanged: () => void }) {
+function PvRow({
+  pv,
+  onChanged,
+  onDelete,
+}: {
+  pv: PV;
+  onChanged: () => void;
+  onDelete: (pv: PV) => void;
+}) {
   const [uploading, setUploading] = useState(false);
-  const [deleting, setDeleting] = useState(false);
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -86,17 +109,6 @@ function PvRow({ pv, onChanged }: { pv: PV; onChanged: () => void }) {
     } finally {
       setUploading(false);
       e.target.value = '';
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!window.confirm(`Supprimer le PV ${pv.pvNumber} ?`)) return;
-    setDeleting(true);
-    try {
-      await pvService.delete(pv.id);
-      onChanged();
-    } finally {
-      setDeleting(false);
     }
   };
 
@@ -130,8 +142,7 @@ function PvRow({ pv, onChanged }: { pv: PV; onChanged: () => void }) {
               <input type="file" accept=".pdf" className="hidden" onChange={handleImport} disabled={uploading} />
             </label>
             <button
-              onClick={handleDelete}
-              disabled={deleting}
+              onClick={() => onDelete(pv)}
               className="text-text-secondary hover:text-state-error disabled:opacity-50"
               aria-label="Supprimer"
             >

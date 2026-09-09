@@ -16,8 +16,10 @@ import { BacsPerTypeChart } from '@/components/dashboard/admin/BacsPerTypeChart'
 import { BacStatusDonutChart } from '@/components/dashboard/admin/BacStatusDonutChart';
 import { InstallationsAreaChart } from '@/components/dashboard/admin/InstallationsAreaChart';
 import { StackedValueAreaChart } from '@/components/dashboard/admin/StackedValueAreaChart';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function DashboardPage() {
+  const user = useAuthStore((state) => state.user);
   const [filters, setFilters] = useState<DashboardFiltersType>({});
   const [data, setData] = useState<DashboardStatsResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -127,7 +129,9 @@ export default function DashboardPage() {
     <div className="mx-auto max-w-6xl p-6">
       <div className="mb-6 flex items-start justify-between">
         <div>
-          <h1 className="text-lg font-bold text-text-primary">Bonjour, Hajar</h1>
+          <h1 className="text-lg font-bold text-text-primary">
+            Bonjour, {user?.firstName || user?.username || ''}
+          </h1>
           <p className="mt-0.5 text-sm text-text-secondary">Aperçu des opérations</p>
         </div>
         <DashboardFilters value={filters} onApply={setFilters} />

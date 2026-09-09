@@ -6,7 +6,7 @@ import { cadreCommandeService } from '@/services/cadreCommandeService';
 import { CadreCommandeItem } from '@/types/cadreCommande';
 import { CadreCommandeCard } from '@/components/cadreCommande/CadreCommandeCard';
 import { CadreCommandeFormModal } from '@/components/cadreCommande/CadreCommandeFormModal';
-import { CadreCommandeDeleteModal } from '@/components/cadreCommande/CadreCommandeDeleteModal';
+import { DeleteConfirmModal } from '@/components/locations/DeleteConfirmModal';
 
 export default function CadreCommandePage() {
   const [items, setItems] = useState<CadreCommandeItem[]>([]);
@@ -92,12 +92,17 @@ export default function CadreCommandePage() {
         />
       )}
 
-{deletingItem && (
-  <CadreCommandeDeleteModal
-    item={deletingItem}
-    onClose={() => setDeletingItem(null)}
-    onDeleted={handleDeleted}
-  />
-)}    </div>
+      {deletingItem && (
+        <DeleteConfirmModal
+          title="Supprimer le cadre de commande"
+          itemLabel={deletingItem.label}
+          onClose={() => setDeletingItem(null)}
+          onConfirm={async () => {
+            await cadreCommandeService.remove(deletingItem.id);
+            handleDeleted(deletingItem.id);
+          }}
+        />
+      )}
+    </div>
   );
 }

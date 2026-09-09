@@ -35,7 +35,7 @@ export function DeleteConfirmModal({ title, itemLabel, onClose, onConfirm }: Del
         </button>
 
         <div className="flex items-center gap-2 mb-2">
-          <AlertTriangle className="w-5 h-5 text-brand-error" />
+          <AlertTriangle className="w-5 h-5 text-state-error" />
           <h2 className="text-lg font-bold text-text-primary">{title}</h2>
         </div>
 
@@ -44,13 +44,13 @@ export function DeleteConfirmModal({ title, itemLabel, onClose, onConfirm }: Del
           <span className="font-semibold text-text-primary">{itemLabel}</span> ? Cette action est irréversible.
         </p>
 
-        {error && <p className="text-sm text-brand-error font-medium mb-4">{error}</p>}
+        {error && <p className="text-sm text-state-error font-medium mb-4">{error}</p>}
 
         <div className="flex items-center justify-end gap-3">
           <button onClick={onClose} className="px-4 py-2.5 rounded-lg text-sm font-semibold text-text-secondary hover:bg-surface-bg transition-colors" disabled={isDeleting}>
             Annuler
           </button>
-          <button onClick={handleDelete} disabled={isDeleting} className="px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-brand-error hover:bg-brand-error/90 active:scale-[0.98] transition-all disabled:opacity-60">
+          <button onClick={handleDelete} disabled={isDeleting} className="px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-state-error hover:bg-state-error/90 active:scale-[0.98] transition-all disabled:opacity-60">
             {isDeleting ? 'Suppression...' : 'Supprimer'}
           </button>
         </div>

@@ -31,7 +31,7 @@ export function EditUserModal({
   const [lastName, setLastName] = useState(user.lastName);
   const [email, setEmail] = useState(user.email);
   const [roleName, setRoleName] = useState(user.role.name);
-  const [active, setActive] = useState(user.active);
+  const active = user.active;
 
   const [roles, setRoles] = useState<RoleOption[]>([]);
 
@@ -192,46 +192,6 @@ export function EditUserModal({
                 </option>
               ))}
             </select>
-
-          </div>
-
-          {/* Status */}
-
-          <div className="mb-6 flex items-center justify-between rounded-lg border border-surface-border p-4">
-
-            <div>
-
-              <p className="font-medium text-text-primary">
-                Compte
-              </p>
-
-              <p className="text-sm text-text-secondary">
-                {active
-                  ? "L'utilisateur peut se connecter."
-                  : "L'utilisateur est désactivé."}
-              </p>
-
-            </div>
-
-            <button
-              type="button"
-              onClick={() =>
-                setActive(!active)
-              }
-              className={`relative h-7 w-12 rounded-full transition ${
-                active
-                  ? 'bg-state-success'
-                  : 'bg-surface-border'
-              }`}
-            >
-              <span
-                className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${
-                  active
-                    ? 'left-6'
-                    : 'left-1'
-                }`}
-              />
-            </button>
 
           </div>
 

@@ -27,6 +27,8 @@ export function BacsPerTypeChart({ data, isLoading }: BacsPerTypeChartProps) {
     enStock: item.enStock,
   }));
 
+  const chartHeight = Math.max(48, chartData.length * 48);
+
   return (
     <div className="rounded-xl border border-border bg-white p-5">
       <div className="mb-4">
@@ -37,14 +39,19 @@ export function BacsPerTypeChart({ data, isLoading }: BacsPerTypeChartProps) {
       </div>
 
       {isLoading ? (
-        <div className="h-[220px] w-full animate-pulse rounded-lg bg-background" />
+        <div className="h-55 w-full animate-pulse rounded-lg bg-background" />
       ) : chartData.length === 0 ? (
         <p className="py-10 text-center text-sm text-text-secondary">Aucune donnée disponible</p>
       ) : (
-        <ChartContainer config={chartConfig} className="h-[220px] w-full">
-          <BarChart accessibilityLayer data={chartData} layout="vertical" margin={{ left: 8 }}>
+        <ChartContainer config={chartConfig} className="w-full" style={{ height: chartHeight }}>
+          <BarChart
+            accessibilityLayer
+            data={chartData}
+            layout="vertical"
+            margin={{ top: 4, right: 8, bottom: 0, left: 0 }}
+          >
             <CartesianGrid horizontal={false} stroke="var(--color-border)" />
-            <XAxis type="number" tickLine={false} axisLine={false} />
+            <XAxis type="number" tickLine={false} axisLine={false} allowDecimals={false} />
             <YAxis
               dataKey="label"
               type="category"
@@ -54,7 +61,13 @@ export function BacsPerTypeChart({ data, isLoading }: BacsPerTypeChartProps) {
               tick={{ fontSize: 11 }}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Bar dataKey="enStock" fill="var(--color-enStock)" radius={4} barSize={22} />
+            <Bar
+              dataKey="enStock"
+              fill="var(--color-enStock)"
+              radius={4}
+              barSize={22}
+              minPointSize={3}
+            />
           </BarChart>
         </ChartContainer>
       )}

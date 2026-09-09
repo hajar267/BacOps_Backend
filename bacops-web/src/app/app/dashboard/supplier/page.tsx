@@ -6,7 +6,7 @@ import { supplierService } from '@/services/suppliersService';
 import { SupplierItem } from '@/types/supplier';
 import { SupplierCard } from '@/components/suppliers/SupplierCard';
 import { SupplierFormModal } from '@/components/suppliers/SupplierFormModal';
-import { SupplierDeleteModal } from '@/components/suppliers/SupplierDeleteModal';
+import { DeleteConfirmModal } from '@/components/locations/DeleteConfirmModal';
 
 export default function SuppliersPage() {
   const [suppliers, setSuppliers] = useState<SupplierItem[]>([]);
@@ -95,10 +95,14 @@ export default function SuppliersPage() {
       )}
 
       {deletingItem && (
-        <SupplierDeleteModal
-          item={deletingItem}
+        <DeleteConfirmModal
+          title="Supprimer le fournisseur"
+          itemLabel={deletingItem.nom}
           onClose={() => setDeletingItem(null)}
-          onDeleted={handleDeleted}
+          onConfirm={async () => {
+            await supplierService.remove(deletingItem.id);
+            handleDeleted(deletingItem.id);
+          }}
         />
       )}
     </div>
