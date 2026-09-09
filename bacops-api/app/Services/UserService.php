@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserService
 {
@@ -60,7 +61,7 @@ class UserService
         $role = Role::where('name', $data['roleName'])->firstOrFail();
 
         $user = User::create([
-            'username' => $data['firstName'].$data['lastName'],
+            'username' => $this->generateUniqueUsername($data['firstName'], $data['lastName']),
             'first_name' => $data['firstName'],
             'last_name' => $data['lastName'],
             'email' => $data['email'],
@@ -70,6 +71,40 @@ class UserService
         ]);
 
         return $user->load('role');
+    }
+
+    private function generateUniqueUsername(string $firstName, string $lastName): string
+    {
+        $normalizedFirstName = $this->normalizeUsernamePart($firstName);
+        $normalizedLastName = $this->normalizeUsernamePart($lastName);
+        $firstNameLength = strlen($normalizedFirstName);
+
+        for ($prefixLength = 1; $prefixLength <= $firstNameLength; $prefixLength++) {
+            $candidate = substr($normalizedFirstName, 0, $prefixLength).$normalizedLastName;
+
+            if (! User::withTrashed()->where('username', $candidate)->exists()) {
+                return $candidate;
+            }
+        }
+
+        $baseUsername = $normalizedFirstName.$normalizedLastName;
+        $suffix = 2;
+
+        do {
+            $candidate = $baseUsername.$suffix;
+            $suffix++;
+        } while (User::withTrashed()->where('username', $candidate)->exists());
+
+        return $candidate;
+    }
+
+    private function normalizeUsernamePart(string $value): string
+    {
+        return (string) preg_replace(
+            '/[^a-z0-9]/',
+            '',
+            Str::lower(Str::ascii(trim($value)))
+        );
     }
 
     public function updatePassword(int $id, string $password): User
