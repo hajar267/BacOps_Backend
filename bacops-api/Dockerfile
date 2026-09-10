@@ -5,6 +5,11 @@ RUN apt-get update \
     && docker-php-ext-install pdo_mysql zip \
     && rm -rf /var/lib/apt/lists/*
 
+RUN printf '%s\n' \
+    'upload_max_filesize=20M' \
+    'post_max_size=21M' \
+    > /usr/local/etc/php/conf.d/uploads.ini
+
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html

@@ -23,7 +23,7 @@ class UploadSignedPvRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => ['required', 'file', 'mimes:pdf'],
+            'file' => ['required', 'file', 'mimes:pdf', 'max:20480'],
         ];
     }
 }

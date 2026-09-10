@@ -9,9 +9,7 @@ use App\Http\Controllers\PVController;
 use App\Http\Controllers\RfidController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\VilleController;
@@ -21,13 +19,11 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\CadreCommandeController;
 use App\Http\Controllers\DechargeController;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
-
+// Authentication
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/refresh', [AuthController::class, 'refresh']);
 
+// Bac types and stock
 Route::middleware(['auth:api', 'permission:stock:read'])->group(function () {
     Route::get('/bac-types/natures', [BacTypeController::class, 'natures']);
     Route::get('/bac-types/capacites', [BacTypeController::class, 'capacites']);
@@ -46,39 +42,42 @@ Route::post('/stock/rfids', [RfidController::class, 'store'])
 Route::post('/stock/bacs', [BacController::class, 'store'])
     ->middleware(['auth:api', 'permission:stock:create']);
 
+Route::middleware(['auth:api', 'permission:stock:read'])->group(function () {
+    Route::get('/cadre-commandes', [CadreCommandeController::class, 'index']);
+});
+
+Route::post('/cadre-commandes', [CadreCommandeController::class, 'store'])
+    ->middleware(['auth:api', 'permission:admin:create']);
+
+// Installations
 Route::post('/installations/BacRFID_avbl', [InstallController::class, 'checkAvailability'])
     ->middleware(['auth:api', 'permission:install:read']);
 
 Route::post('/installations/install', [InstallController::class, 'store'])
     ->middleware(['auth:api', 'permission:install:create']);
 
+// Bac search
 Route::middleware(['auth:api'])->group(function () {
     Route::get('/search/bac/infos', [SearchController::class, 'infos']);
     Route::get('/search/bac/{id}/history', [SearchController::class, 'history']);
     Route::get('/search/bac/location', [SearchController::class, 'locations']);
 });
 
-Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
-    Route::get('/pv', [PVController::class, 'index']);
-    Route::get('/pv/preview', [PVController::class, 'preview']);
-});
-
-Route::post('/pv/download', [PVController::class, 'store'])
-    ->middleware(['auth:api', 'permission:admin:create']);
-
-Route::delete('/pv/{id}', [PVController::class, 'destroy'])
-    ->middleware(['auth:api', 'permission:admin:update']);
-
-Route::post('/pv/{id}/signed', [PVController::class, 'uploadSigned'])
-    ->middleware(['auth:api', 'permission:admin:create']);
-
+// Dashboard
 Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
     Route::get('/dashboard/installations', [DashboardController::class, 'installations']);
     Route::get('/dashboard/bacs-per-type', [DashboardController::class, 'bacsPerType']);
     Route::get('/dashboard/bac-value', [DashboardController::class, 'bacValue']);
+});
+
+// Users
+Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
     Route::get('/users', [UserController::class, 'index']);
 });
+
+Route::post('/users', [UserController::class, 'store'])
+    ->middleware(['auth:api', 'permission:admin:create']);
 
 Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
     Route::put('/users/{user}', [UserController::class, 'update']);
@@ -86,23 +85,7 @@ Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
     Route::delete('/users/{user}', [UserController::class, 'destroy']);
 });
 
-Route::post('/users', [UserController::class, 'store'])
-    ->middleware(['auth:api', 'permission:admin:create']);
-
-// Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
-//     Route::get('/locations/tree', [LocationController::class, 'tree']);
-// });
-
-// Route::middleware(['auth:api', 'permission:admin:create'])->group(function () {
-//     Route::post('/arrondissements', [LocationController::class, 'store']);
-// });
-
-// Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
-//     Route::put('/arrondissements/{id}', [LocationController::class, 'update']);
-//     Route::delete('/arrondissements/{id}', [LocationController::class, 'destroy']);
-// });
-
-//////////////////
+// Locations
 Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
     Route::get('/villes', [VilleController::class, 'index']);
     Route::get('/prefectures', [PrefectureController::class, 'index']);
@@ -123,21 +106,22 @@ Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
     Route::put('/arrondissements/{arrondissement}', [ArrondissementController::class, 'update']);
     Route::delete('/arrondissements/{arrondissement}', [ArrondissementController::class, 'destroy']);
 });
-//////////////////
 
+// Roles and permissions
 Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
     Route::get('/permissions', [PermissionController::class, 'index']);
     Route::get('/roles', [RoleController::class, 'index']);
 });
 
-Route::middleware(['auth:api', 'permission:admin:create'])
-    ->post('/roles', [RoleController::class, 'store']);
+Route::post('/roles', [RoleController::class, 'store'])
+    ->middleware(['auth:api', 'permission:admin:create']);
 
 Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
     Route::put('/roles/{role}', [RoleController::class, 'update']);
     Route::delete('/roles/{role}', [RoleController::class, 'destroy']);
 });
 
+// Suppliers
 Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
     Route::get('/suppliers', [SupplierController::class, 'index']);
 });
@@ -145,46 +129,34 @@ Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
 Route::post('/suppliers', [SupplierController::class, 'store'])
     ->middleware(['auth:api', 'permission:admin:create']);
 
-
-// Route::middleware('auth:api')->get('/pvs/{pv}/signed-pdf', [PVController::class, 'signedPdf'])->name('pvs.signed-pdf');
-
-Route::middleware('auth:api')->get('/attachments/{attachment}/file', [AttachmentController::class, 'file'])->name('attachments.file');
-
-Route::middleware(['auth:api', 'permission:stock:read'])->group(function () {
-    Route::get('/cadre-commandes', [CadreCommandeController::class, 'index']);
-});
-Route::post('/cadre-commandes', [CadreCommandeController::class, 'store'])
-    ->middleware(['auth:api', 'permission:admin:create']);
-
-// ////////testing stuff
-// Route::get('/hello', function () {
-//     return response()->json([
-//         'message' => 'Hello from Laravel'
-//     ]);
-// });
-// ////////
-
-
-// Suppliers
 Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
     Route::put('/suppliers/{supplier}', [SupplierController::class, 'update']);
-});
-Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
     Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy']);
 });
 
-// Cadre Commande
+// Cadre de commandes
 Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
     Route::put('/cadre-commandes/{cadreCommande}', [CadreCommandeController::class, 'update']);
-});
-Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
     Route::delete('/cadre-commandes/{cadreCommande}', [CadreCommandeController::class, 'destroy']);
 });
 
-// Bac Type
+// Procès-verbaux
+Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
+    Route::get('/pv', [PVController::class, 'index']);
+    Route::get('/pv/preview', [PVController::class, 'preview']);
+});
+
+Route::post('/pv/download', [PVController::class, 'store'])
+    ->middleware(['auth:api', 'permission:admin:create']);
+
+Route::delete('/pv/{id}', [PVController::class, 'destroy'])
+    ->middleware(['auth:api', 'permission:admin:update']);
+
+Route::post('/pv/{id}/signed', [PVController::class, 'uploadSigned'])
+    ->middleware(['auth:api', 'permission:admin:create']);
+
+// Bac type deletion
 Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
     Route::put('/bac-types/bac-types/{bacType}', [BacTypeController::class, 'update']);
-});
-Route::middleware(['auth:api', 'permission:admin:update'])->group(function () {
     Route::delete('/bac-types/bac-types/{bacType}', [BacTypeController::class, 'destroy']);
 });

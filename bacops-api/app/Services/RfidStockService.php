@@ -14,24 +14,17 @@ class RfidStockService
 {
     public function createRfidsStock(array $input, int $currentUserId): array
     {
-        $prefix = trim($input['prefix']);
         $commentaire = $input['commentaire'] ?? null;
+        $rfidCodes = array_map(function ($code) {
+            $code = strtoupper(trim((string) $code));
+            $this->assertValid($code !== '', 'Chaque code RFID ne doit pas être vide');
+            $this->assertValid((bool) preg_match('/^[0-9A-F]+$/', $code), 'Chaque code RFID doit être hexadecimal');
 
-        $this->assertValid($prefix !== '', 'Le champ prefix ne doit pas être vide');
-        $this->assertValid((bool) preg_match('/^[A-Za-z0-9]+$/', $prefix), 'Le champ prefix doit contenir uniquement des lettres et des chiffres');
-        $this->assertValid(is_int($input['rfid_debut']) && $input['rfid_debut'] > 0, 'Le champ rfid_debut doit être un entier positif');
-        $this->assertValid(is_int($input['rfid_fin']) && $input['rfid_fin'] > 0, 'Le champ rfid_fin doit être un entier positif');
-        $this->assertValid($input['rfid_fin'] >= $input['rfid_debut'], 'Le champ rfid_fin doit être supérieur ou égal à rfid_debut');
-        $this->assertValid(is_int($input['quantite']) && $input['quantite'] > 0, 'Le champ quantite doit être un entier positif');
-        $this->assertValid(
-            ($input['rfid_fin'] - $input['rfid_debut'] + 1) === $input['quantite'],
-            'La quantité ne correspond pas à la plage de codes RFID'
-        );
+            return $code;
+        }, $input['rfids']);
 
-        $rfidCodes = [];
-        for ($i = 0; $i < $input['quantite']; $i++) {
-            $rfidCodes[] = $prefix . ($input['rfid_debut'] + $i);
-        }
+        $this->assertValid(count($rfidCodes) === count(array_unique($rfidCodes)), 'La liste contient des codes RFID en double');
+        $quantite = count($rfidCodes);
 
         $conflicts = RFID::whereIn('rfid_code', $rfidCodes)->pluck('rfid_code')->all();
 
@@ -40,9 +33,9 @@ class RfidStockService
         }
 
         try {
-            DB::transaction(function () use ($input, $commentaire, $currentUserId, $rfidCodes) {
+            DB::transaction(function () use ($commentaire, $currentUserId, $rfidCodes, $quantite) {
                 $commande = commandes_rfid::create([
-                    'quantite' => $input['quantite'],
+                    'quantite' => $quantite,
                     'commentaire' => $commentaire,
                     'added_by' => $currentUserId,
                 ]);
@@ -62,12 +55,12 @@ class RfidStockService
                 $summary = StockSummaryRFID::first();
 
                 if ($summary) {
-                    $summary->increment('total', $input['quantite']);
-                    $summary->increment('disponible', $input['quantite']);
+                    $summary->increment('total', $quantite);
+                    $summary->increment('disponible', $quantite);
                 } else {
                     StockSummaryRFID::create([
-                        'total' => $input['quantite'],
-                        'disponible' => $input['quantite'],
+                        'total' => $quantite,
+                        'disponible' => $quantite,
                         'en_service' => 0,
                         'perdu' => 0,
                     ]);
@@ -83,9 +76,9 @@ class RfidStockService
         }
 
         return [
-            'message' => "{$input['quantite']} RFIDs ajoutés au stock avec succès",
-            'quantite' => $input['quantite'],
-            'range' => "{$prefix}{$input['rfid_debut']} → {$prefix}{$input['rfid_fin']}",
+            'message' => "{$quantite} RFIDs ajoutés au stock avec succès",
+            'quantite' => $quantite,
+            'rfids' => $rfidCodes,
         ];
     }
 

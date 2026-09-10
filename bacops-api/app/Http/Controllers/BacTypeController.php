@@ -105,9 +105,18 @@ class BacTypeController extends Controller
 
 public function destroy(BacType $bacType): JsonResponse
 {
-    $bacType->update(['is_active' => false]);
+    try {
+        $this->service->deleteBacType($bacType);
 
-    return response()->json(null, 204);
+        return response()->json(null, 204);
+    } catch (BacTypeServiceException $e) {
+        $payload = ['error' => $e->getMessage()];
+        if ($e->getConflicts()) {
+            $payload['conflicts'] = $e->getConflicts();
+        }
+
+        return response()->json($payload, $e->getStatusCode());
+    }
 }
 
 }

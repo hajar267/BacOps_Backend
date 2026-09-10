@@ -25,11 +25,9 @@ class CreateRfidsStockRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'prefix' => ['required', 'string', 'min:1', 'regex:/^[A-Za-z0-9]+$/'],
-            'rfid_debut' => ['required', 'integer', 'min:1'],
-            'rfid_fin' => ['required', 'integer', 'min:1'],
-            'quantite' => ['required', 'integer', 'min:1'],
-            'commentaire' => ['sometimes', 'string'],
+            'rfids' => ['required', 'array', 'min:1'],
+            'rfids.*' => ['required', 'string', 'min:1', 'regex:/^[0-9A-Fa-f]+$/'],
+            'commentaire' => ['sometimes', 'nullable', 'string'],
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Exceptions\BacTypeServiceException;
+use App\Models\Bac;
 use App\Models\BacType;
 
 class BacTypeService
@@ -146,6 +147,24 @@ class BacTypeService
     ]);
 
     return $bacType;
+}
+
+public function deleteBacType(BacType $bacType): void
+{
+    $inStock = Bac::query()
+        ->where('bac_type_id', $bacType->id)
+        ->where('status', 'en_stock')
+        ->count();
+
+    if ($inStock > 0) {
+        throw new BacTypeServiceException(
+            'Impossible de supprimer ce type de bac : des bacs sont encore en stock',
+            409,
+            [$inStock]
+        );
+    }
+
+    $bacType->update(['is_active' => false]);
 }
 
 }

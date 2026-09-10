@@ -71,7 +71,10 @@ class BacStockService
             $serialNumbers[] = "{$serial}-{$prefix}";
         }
 
-        $conflicts = Bac::whereIn('serial_number', $serialNumbers)->pluck('serial_number')->all();
+        $conflicts = Bac::where('bac_type_id', $bacType->id)
+            ->whereIn('serial_number', $serialNumbers)
+            ->pluck('serial_number')
+            ->all();
 
         if (count($conflicts) > 0) {
             throw new StockServiceException('Les numéros de série suivants existent déjà', 409, $conflicts);
@@ -103,7 +106,9 @@ class BacStockService
 
                 Bac::insert($rows);
 
-                $bacIds = Bac::whereIn('serial_number', $serialNumbers)->pluck('id', 'serial_number');
+                $bacIds = Bac::where('bac_type_id', $bacType->id)
+                    ->whereIn('serial_number', $serialNumbers)
+                    ->pluck('id', 'serial_number');
 
                 $historyRows = array_map(fn ($serial) => [
                     'bac_id' => $bacIds[$serial],
