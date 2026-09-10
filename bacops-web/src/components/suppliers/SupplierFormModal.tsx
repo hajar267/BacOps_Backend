@@ -58,7 +58,7 @@ export function SupplierFormModal({ mode = 'create', initialData, onClose, onSav
 
       onSaved(saved);
       onClose();
-    } catch (err) {
+    } catch {
       setError("Une erreur est survenue lors de l'enregistrement.");
     } finally {
       setIsSaving(false);
@@ -89,7 +89,12 @@ export function SupplierFormModal({ mode = 'create', initialData, onClose, onSav
             className="flex h-16 w-16 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-dashed border-border bg-background"
           >
             {previewUrl ? (
-              <img src={previewUrl} alt="Logo preview" className="h-full w-full object-cover" />
+              <div
+                role="img"
+                aria-label="Logo preview"
+                className="h-full w-full bg-cover bg-center"
+                style={{ backgroundImage: `url(${previewUrl})` }}
+              />
             ) : (
               <Factory className="h-6 w-6 text-text-secondary/50" />
             )}

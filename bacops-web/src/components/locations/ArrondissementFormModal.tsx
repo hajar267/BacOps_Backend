@@ -57,7 +57,7 @@ export function ArrondissementFormModal({
         : await arrondissementService.create(payload);
       onSaved(result);
       onClose();
-    } catch (err) {
+    } catch {
       setError("Une erreur est survenue lors de l'enregistrement.");
     } finally {
       setIsSubmitting(false);

@@ -34,7 +34,7 @@ export function BacHistorySheet({ bac, open, onOpenChange }: BacHistorySheetProp
 
   useEffect(() => {
     if (!open || !bac) return;
-    setIsLoading(true);
+    queueMicrotask(() => setIsLoading(true));
     searchService
       .history(bac.id)
       .then(setEvents)

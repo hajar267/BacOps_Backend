@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -17,6 +17,9 @@ function buildIcon(active: boolean) {
     iconAnchor: active ? [20, 20] : [17, 17],
   });
 }
+
+const ACTIVE_ICON = buildIcon(true);
+const INACTIVE_ICON = buildIcon(false);
 
 interface FlyToProps {
   target: { lat: number; lng: number } | null;
@@ -43,9 +46,6 @@ export default function BacMapInner({
   flyTarget,
   onMarkerClick,
 }: BacMapInnerProps) {
-  const activeIcon = useRef(buildIcon(true)).current;
-  const inactiveIcon = useRef(buildIcon(false)).current;
-
   return (
     <MapContainer
       center={[33.9989, -6.8539]}
@@ -63,7 +63,7 @@ export default function BacMapInner({
           <Marker
             key={loc.id}
             position={[loc.locationLat as number, loc.locationLng as number]}
-            icon={loc.id === selectedId ? activeIcon : inactiveIcon}
+            icon={loc.id === selectedId ? ACTIVE_ICON : INACTIVE_ICON}
             eventHandlers={{ click: () => onMarkerClick(loc) }}
           />
         ))}

@@ -34,7 +34,7 @@ export function CadreCommandeFormModal({ mode = 'create', initialData, onClose, 
 
       onSaved(saved);
       onClose();
-    } catch (err) {
+    } catch {
       setError("Une erreur est survenue lors de l'enregistrement.");
     } finally {
       setIsSaving(false);

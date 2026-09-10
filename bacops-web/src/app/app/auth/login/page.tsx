@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { User, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -20,7 +21,16 @@ export default function LoginPage() {
     if (!username.trim() || !password) return;
     try {
       await login(username.trim(), password);
-      router.push('/app/dashboard');
+      const role = useAuthStore.getState().user?.role.name;
+      if (role === 'admin') {
+        router.push('/app/admin/dashboard');
+      } else if (role === 'install') {
+        router.push('/app/install');
+      } else if (role === 'magasin') {
+        router.push('/app/magasin');
+      } else {
+        router.push('/app/access-denied');
+      }
     } catch {
       // error already set in the store
     }
@@ -31,7 +41,7 @@ export default function LoginPage() {
       {/* Left: branding panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-brand-primary items-center justify-center p-12">
         <div className="max-w-md text-white">
-          <img src="/arma_logo.jpg" alt="BacOps" className="w-24 mb-8" />
+          <Image src="/arma_logo.jpg" alt="BacOps" width={96} height={96} className="mb-8 h-auto w-24" />
           <h2 className="text-3xl font-bold mb-4">Gestion des Bacs & RFID</h2>
           <p className="text-white/80 text-lg">
             Suivi en temps réel de votre flotte de conteneurs et interventions terrain.
@@ -46,7 +56,7 @@ export default function LoginPage() {
           className="w-full max-w-sm rounded-2xl p-10 bg-white shadow-sm shadow-black/5"
         >
           <div className="flex flex-col items-center mb-8 lg:hidden">
-            <img src="/arma_logo.jpg" alt="BacOps" className="w-24 mb-4" />
+            <Image src="/arma_logo.jpg" alt="BacOps" width={96} height={96} className="mb-4 h-auto w-24" />
           </div>
 
           <h1 className="text-xl font-bold mb-1 text-text-primary">

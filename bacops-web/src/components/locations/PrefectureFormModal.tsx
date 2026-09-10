@@ -40,7 +40,7 @@ export function PrefectureFormModal({ prefecture, villes, onClose, onSaved }: Pr
         : await prefectureService.create(payload);
       onSaved(result);
       onClose();
-    } catch (err) {
+    } catch {
       setError("Une erreur est survenue lors de l'enregistrement.");
     } finally {
       setIsSubmitting(false);

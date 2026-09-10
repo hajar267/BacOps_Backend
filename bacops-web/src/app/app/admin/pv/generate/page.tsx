@@ -95,7 +95,7 @@ const handlePreview = async () => {
       });
 
       doc.save(`PV_${Date.now()}.pdf`);
-      router.push('/app/dashboard/pv');
+      router.push('/app/admin/pv');
     } catch {
       setError('Erreur lors de la génération du PDF');
     } finally {

@@ -70,7 +70,7 @@ export function RoleFormModal({ role, onClose, onSaved }: RoleFormModalProps) {
 
       onSaved(result);
       onClose();
-    } catch (err) {
+    } catch {
       setError("Une erreur est survenue lors de l'enregistrement.");
     } finally {
       setIsSubmitting(false);

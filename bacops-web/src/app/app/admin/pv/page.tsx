@@ -42,7 +42,7 @@ export default function PvListPage() {
           <p className="text-sm text-text-secondary mt-1">Gérer les procès-verbaux</p>
         </div>
         <Link
-          href="/app/dashboard/pv/generate"
+          href="/app/admin/pv/generate"
           className="px-4 py-2 rounded-lg bg-brand-primary text-white text-sm font-semibold"
         >
           + Générer PV
@@ -98,14 +98,27 @@ function PvRow({
   onDelete: (pv: PV) => void;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.type !== 'application/pdf') {
+      setUploadError('Veuillez sélectionner un fichier PDF.');
+      e.target.value = '';
+      return;
+    }
+
     setUploading(true);
+    setUploadError(null);
     try {
       await pvService.uploadSigned(pv.id, file);
       onChanged();
+    } catch (error: unknown) {
+      const responseMessage = (
+        error as { response?: { data?: { message?: string; errors?: { file?: string[] } } } }
+      ).response?.data;
+      setUploadError(responseMessage?.errors?.file?.[0] ?? responseMessage?.message ?? 'Échec de l’import du PDF.');
     } finally {
       setUploading(false);
       e.target.value = '';
@@ -149,6 +162,9 @@ function PvRow({
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
+        )}
+        {uploadError && (
+          <p className="mt-2 text-xs text-state-error">{uploadError}</p>
         )}
       </td>
     </tr>

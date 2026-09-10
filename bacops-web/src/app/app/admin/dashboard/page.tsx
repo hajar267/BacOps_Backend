@@ -37,8 +37,10 @@ export default function DashboardPage() {
   useEffect(() => {
     let cancelled = false;
 
-    setIsLoading(true);
-    setError(null);
+    queueMicrotask(() => {
+      setIsLoading(true);
+      setError(null);
+    });
 
     dashboardService
       .stats(filters)
@@ -61,7 +63,7 @@ export default function DashboardPage() {
   useEffect(() => {
     let cancelled = false;
 
-    setIsInstallationsLoading(true);
+    queueMicrotask(() => setIsInstallationsLoading(true));
 
     dashboardService
       .installations(filters)
@@ -85,7 +87,7 @@ export default function DashboardPage() {
   useEffect(() => {
     let cancelled = false;
 
-    setIsBacValueLoading(true);
+    queueMicrotask(() => setIsBacValueLoading(true));
 
     dashboardService
       .bacValue(filters)

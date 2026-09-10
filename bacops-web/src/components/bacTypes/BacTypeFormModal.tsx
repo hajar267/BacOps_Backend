@@ -76,7 +76,7 @@ export function BacTypeFormModal({ mode = 'create', initialData, onClose, onSave
 
       onSaved(saved);
       onClose();
-    } catch (err) {
+    } catch {
       setError("Une erreur est survenue lors de l'enregistrement.");
     } finally {
       setIsSaving(false);

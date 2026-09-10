@@ -20,21 +20,17 @@ export type NavEntry = NavLink | NavGroup;
 export const NAV_ITEMS: Record<string, NavEntry[]> = {
   admin: [
     {
-  type: 'group',
-  label: 'Tableau de bord',
-  icon: 'layoutdashboard',
-  items: [
-    { label: 'tableau', href: '/app/dashboard', icon: 'layoutdashboard' },
-  ],
-},
+      type: 'link',
+      label: 'Tableau de bord',
+      href: '/app/admin/dashboard',
+      icon: 'layoutdashboard',
+    },
     {
-  type: 'group',
-  label: 'Rechercher',
-  icon: 'search',
-  items: [
-    { label: 'Rechercher', href: '/app/dashboard/search', icon: 'search' },
-  ],
-},
+      type: 'link',
+      label: 'Rechercher',
+      href: '/app/admin/search',
+      icon: 'search',
+    },
     // {
     //   type: 'group',
     //   label: 'Mon compte',
@@ -48,8 +44,8 @@ export const NAV_ITEMS: Record<string, NavEntry[]> = {
       label: 'Utilisateurs',
       icon: 'users',
       items: [
-        { label: 'Gestion des utilisateurs', href: '/app/dashboard/users', icon: 'users' },
-        { label: 'permissions', href: '/app/dashboard/roles', icon: 'Shield' },
+        { label: 'Gestion des utilisateurs', href: '/app/admin/users', icon: 'users' },
+        { label: 'permissions', href: '/app/admin/roles', icon: 'Shield' },
       ],
     },
     {
@@ -57,33 +53,29 @@ export const NAV_ITEMS: Record<string, NavEntry[]> = {
       label: 'Configuration',
       icon: 'settings',
       items: [
-        { label: 'Types de bac', href: '/app/dashboard/types', icon: 'box' },
-        { label: 'Procès-Verbaux', href: '/app/dashboard/pv', icon: 'file' },
-        { label: 'Gestion des arronds', href: '/app/dashboard/arrond', icon: 'map' },
-        { label: 'Fournisseurs', href: '/app/dashboard/supplier', icon: 'truck' },
-        { label: 'Cadre de commande', href: '/app/dashboard/commande', icon: 'tag' },
-        { label: 'Decharges', href: '/app/dashboard/decharges', icon: 'files' },
+        { label: 'Types de bac', href: '/app/admin/types', icon: 'box' },
+        { label: 'Procès-Verbaux', href: '/app/admin/pv', icon: 'file' },
+        { label: 'Gestion des arronds', href: '/app/admin/arrond', icon: 'map' },
+        { label: 'Fournisseurs', href: '/app/admin/supplier', icon: 'truck' },
+        { label: 'Cadre de commande', href: '/app/admin/commande', icon: 'tag' },
+        { label: 'Decharges', href: '/app/admin/decharges', icon: 'files' },
       ],
     },
   ],
   install: [
     {
-      type: 'group',
-      label: 'Mon compte',
-      icon: 'user',
-      items: [
-        { label: 'Changer mot de passe', href: '/app/dashboard/account/password', icon: 'lock' },
-      ],
+      type: 'link',
+      label: 'Installations',
+      href: '/app/install',
+      icon: 'map',
     },
   ],
   magasin: [
     {
-      type: 'group',
-      label: 'Mon compte',
-      icon: 'user',
-      items: [
-        { label: 'Changer mot de passe', href: '/app/dashboard/account/password', icon: 'lock' },
-      ],
+      type: 'link',
+      label: 'Stock',
+      href: '/app/magasin',
+      icon: 'box',
     },
   ],
 };

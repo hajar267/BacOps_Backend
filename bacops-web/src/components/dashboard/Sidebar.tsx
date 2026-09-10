@@ -7,11 +7,17 @@ import {
   LogOut, LayoutDashboard, FileText, Users, Box, Tag,
   ListChecks, Settings, User, Lock, ChevronDown, 
   ChevronRight, Shield, MapPinned, Truck, FolderArchive,
-  Search
+  Search, PanelLeftClose, PanelLeftOpen
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getInitials } from '@/utils/initials';
 import { NAV_ITEMS, NavEntry } from '@/constants/navigation';
+
+interface SidebarProps {
+  items?: NavEntry[];
+  collapsed?: boolean;
+  onCollapsedChange?: (collapsed: boolean) => void;
+}
 
 const ICONS: Record<string, React.ElementType> = {
   chart: LayoutDashboard,
@@ -31,7 +37,7 @@ const ICONS: Record<string, React.ElementType> = {
   search: Search,
 };
 
-export function Sidebar() {
+export function Sidebar({ items, collapsed = false, onCollapsedChange }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
@@ -40,7 +46,7 @@ export function Sidebar() {
 
   if (!user) return null;
 
-  const navEntries: NavEntry[] = NAV_ITEMS[user.role.name] ?? [];
+  const navEntries: NavEntry[] = items ?? NAV_ITEMS[user.role.name] ?? [];
 
   const handleLogout = () => {
     logout();
@@ -48,16 +54,16 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="w-64 h-screen flex flex-col bg-white border-r border-surface-border">
+    <aside className={`h-screen flex flex-col bg-white border-r border-surface-border transition-[width] duration-200 ${collapsed ? 'w-16' : 'w-64'}`}>
       {/* User block */}
-      <div className="p-5 border-b border-surface-border bg-brand-primary/6">
-        <div className="flex items-center gap-3">
+      <div className={`relative border-b border-surface-border bg-brand-primary/6 ${collapsed ? 'p-3' : 'p-5'}`}>
+        <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
           <div className="w-11 h-11 rounded-full bg-brand-primary/15 border border-brand-primary/20 flex items-center justify-center shrink-0">
             <span className="text-sm font-bold text-text-primary tracking-wide">
               {getInitials(user.firstName, user.lastName)}
             </span>
           </div>
-          <div className="min-w-0">
+          <div className={collapsed ? 'hidden' : 'min-w-0'}>
             <p className="font-bold text-text-primary truncate">
               {user.firstName} {user.lastName}
             </p>
@@ -66,10 +72,21 @@ export function Sidebar() {
             </span>
           </div>
         </div>
+        {onCollapsedChange && (
+          <button
+            type="button"
+            onClick={() => onCollapsedChange(!collapsed)}
+            className="absolute right-2 bottom-2 flex h-8 w-8 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-white/60 hover:text-text-primary"
+            aria-label={collapsed ? 'Ouvrir la barre latérale' : 'Réduire la barre latérale'}
+            title={collapsed ? 'Ouvrir la barre latérale' : 'Réduire la barre latérale'}
+          >
+            {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+          </button>
+        )}
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto p-3">
+      <nav className={`flex-1 overflow-y-auto ${collapsed ? 'p-2' : 'p-3'}`}>
         {navEntries.map((entry) => {
           if (entry.type === 'link') {
             const Icon = ICONS[entry.icon] ?? LayoutDashboard;
@@ -85,7 +102,7 @@ export function Sidebar() {
                 }`}
               >
                 <Icon className="w-4.5 h-4.5" />
-                {entry.label}
+                <span className={collapsed ? 'hidden' : ''}>{entry.label}</span>
               </Link>
             );
           }
@@ -97,18 +114,18 @@ export function Sidebar() {
             <div key={entry.label} className="mb-1">
               <button
                 onClick={() => setExpanded(isOpen ? null : entry.label)}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-text-secondary hover:bg-surface-bg transition-colors"
+                className={`w-full flex items-center gap-3 rounded-lg py-2.5 text-sm font-semibold text-text-secondary transition-colors hover:bg-surface-bg ${collapsed ? 'justify-center px-1' : 'px-3'}`}
               >
                 <GroupIcon className="w-4.5 h-4.5" />
-                <span className="flex-1 text-left">{entry.label}</span>
-                {isOpen ? (
+                <span className={collapsed ? 'hidden' : 'flex-1 text-left'}>{entry.label}</span>
+                {!collapsed && (isOpen ? (
                   <ChevronDown className="w-4 h-4" />
                 ) : (
                   <ChevronRight className="w-4 h-4" />
-                )}
+                ))}
               </button>
 
-              {isOpen && (
+              {isOpen && !collapsed && (
                 <div className="ml-6 mt-1 border-l border-surface-border pl-3">
                   {entry.items.map((item) => {
                     const ItemIcon = ICONS[item.icon] ?? Box;
@@ -136,13 +153,13 @@ export function Sidebar() {
       </nav>
 
       {/* Logout */}
-      <div className="p-4 border-t border-surface-border">
+      <div className={`border-t border-surface-border ${collapsed ? 'p-2' : 'p-4'}`}>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-text-primary hover:bg-surface-bg transition-colors"
+          className={`w-full flex items-center gap-3 rounded-lg py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-surface-bg ${collapsed ? 'justify-center px-1' : 'px-3'}`}
         >
           <LogOut className="w-4.5 h-4.5" />
-          Déconnexion
+          <span className={collapsed ? 'hidden' : ''}>Déconnexion</span>
         </button>
       </div>
     </aside>

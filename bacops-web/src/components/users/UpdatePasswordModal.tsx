@@ -43,7 +43,7 @@ export function UpdatePasswordModal({
       });
       onUpdated?.();
       onClose();
-    } catch (err) {
+    } catch {
       setError("Une erreur est survenue lors de la mise à jour du mot de passe.");
     } finally {
       setIsSubmitting(false);

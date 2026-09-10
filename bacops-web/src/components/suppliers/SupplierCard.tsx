@@ -12,7 +12,12 @@ export function SupplierCard({ item, onEdit, onDelete }: SupplierCardProps) {
     <div className="flex items-center gap-3 rounded-xl border border-border bg-white p-3">
       <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-background">
         {item.logoUrl ? (
-          <img src={item.logoUrl} alt={item.nom} className="h-full w-full object-cover" />
+          <div
+            role="img"
+            aria-label={item.nom}
+            className="h-full w-full bg-cover bg-center"
+            style={{ backgroundImage: `url(${item.logoUrl})` }}
+          />
         ) : (
           <Factory className="h-4 w-4 text-text-secondary/50" />
         )}

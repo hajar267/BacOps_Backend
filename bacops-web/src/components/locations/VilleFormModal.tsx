@@ -33,7 +33,7 @@ export function VilleFormModal({ ville, onClose, onSaved }: VilleFormModalProps)
         : await villeService.create({ name: name.trim() });
       onSaved(result);
       onClose();
-    } catch (err) {
+    } catch {
       setError("Une erreur est survenue lors de l'enregistrement.");
     } finally {
       setIsSubmitting(false);

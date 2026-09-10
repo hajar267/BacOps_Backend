@@ -1,7 +1,7 @@
-export default function MagasinHome() {
+export default function InstallHome() {
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-        HELLO FROM MAGASIN PAGE
+        HELLO FROM INSTALL PAGE
     </div>
   );
 }

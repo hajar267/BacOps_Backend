@@ -20,9 +20,7 @@ export const pvService = {
   uploadSigned: async (id: number, file: File): Promise<PV> => {
     const formData = new FormData();
     formData.append('file', file);
-    const { data } = await api.post<PV>(`/pv/${id}/signed`, formData, { // ← fixed
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const { data } = await api.post<PV>(`/pv/${id}/signed`, formData);
     return data;
   },
 

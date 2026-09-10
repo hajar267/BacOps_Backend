@@ -3,7 +3,6 @@ import { useAuthStore } from '@/stores/authStore';
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL, // e.g. http://localhost:8000/api
-  headers: { 'Content-Type': 'application/json' },
 });
 
 // Attach access token on every request
