@@ -14,7 +14,7 @@ interface AuthState {
   error: string | null;
 
   login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   refreshAccessToken: () => Promise<void>;
   clearError: () => void;
     hasHydrated: boolean;
@@ -55,13 +55,21 @@ login: async (username, password) => {
     throw err;
   }
 },
-      logout: () => {
-        set({
-          user: null,
-          accessToken: null,
-          refreshToken: null,
-          isAuthenticated: false,
-        });
+      logout: async () => {
+        const refreshToken = get().refreshToken;
+
+        try {
+          if (refreshToken) {
+            await authService.logout(refreshToken);
+          }
+        } finally {
+          set({
+            user: null,
+            accessToken: null,
+            refreshToken: null,
+            isAuthenticated: false,
+          });
+        }
       },
 
       refreshAccessToken: async () => {

@@ -38,6 +38,10 @@ class BacStockService
         $this->assertValid($color !== '', 'Le champ color ne doit pas être vide');
         $this->assertValid(is_int($input['quantite']) && $input['quantite'] > 0, 'Le champ quantite doit être un entier positif');
         $this->assertValid(
+            $input['quantite'] <= config('stock.max_bac_items'),
+            'La quantité maximale autorisée est ' . config('stock.max_bac_items')
+        );
+        $this->assertValid(
             ($input['numero_fin'] - $input['numero_debut'] + 1) === $input['quantite'],
             'La quantité ne correspond pas à la plage de numéros de série'
         );

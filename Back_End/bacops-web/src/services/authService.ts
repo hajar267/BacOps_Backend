@@ -13,7 +13,9 @@ refresh: async (refreshToken: string): Promise<{ accessToken: string }> => {
   });
   return data;
 },
-//   logout: async (): Promise<void> => {
-//     await api.post('/auth/logout');
-//   },
+  logout: async (refreshToken: string): Promise<void> => {
+    await api.post('/auth/logout', { refreshToken }, {
+      skipAuthRefresh: true,
+    });
+  },
 };

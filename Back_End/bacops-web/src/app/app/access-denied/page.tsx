@@ -8,8 +8,8 @@ export default function AccessDeniedPage() {
   const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.replace('/app/auth/login');
   };
 

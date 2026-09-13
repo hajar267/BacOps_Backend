@@ -48,8 +48,8 @@ export function Sidebar({ items, collapsed = false, onCollapsedChange }: Sidebar
 
   const navEntries: NavEntry[] = items ?? NAV_ITEMS[user.role.name] ?? [];
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push('/app/auth/login');
   };
 

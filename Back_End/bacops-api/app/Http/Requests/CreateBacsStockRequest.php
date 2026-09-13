@@ -31,10 +31,10 @@ public function rules(): array
         'matiere' => ['required', 'string', 'min:1'],
         'color' => ['required', 'string', 'min:1'],
         'cadre_commande_id' => ['required', 'integer', 'exists:cadre_commande,id'],
-        'quantite' => ['required', 'integer', 'min:1'],
+        'quantite' => ['required', 'integer', 'min:1', 'max:' . config('stock.max_bac_items')],
         'prix' => ['required', 'numeric', 'gt:0'],
         'fournisseur_id' => ['required', 'integer', 'exists:suppliers,id'],
-        'commentaire' => ['sometimes', 'string'],
+        'commentaire' => ['sometimes', 'nullable', 'string'],
     ];
 }
 }

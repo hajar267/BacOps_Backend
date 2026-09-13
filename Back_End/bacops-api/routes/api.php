@@ -20,8 +20,12 @@ use App\Http\Controllers\CadreCommandeController;
 use App\Http\Controllers\DechargeController;
 
 // Authentication
-Route::post('/auth/login', [AuthController::class, 'login']);
-Route::post('/auth/refresh', [AuthController::class, 'refresh']);
+Route::post('/auth/login', [AuthController::class, 'login'])
+    ->middleware('throttle:5,1');
+Route::post('/auth/refresh', [AuthController::class, 'refresh'])
+    ->middleware('throttle:10,1');
+Route::post('/auth/logout', [AuthController::class, 'logout'])
+    ->middleware('auth:api');
 
 // Bac types and stock
 Route::middleware(['auth:api', 'permission:stock:read'])->group(function () {
@@ -37,10 +41,10 @@ Route::post('/bac-types/bac-types', [BacTypeController::class, 'store'])
     ->middleware(['auth:api', 'permission:stock:create']);
 
 Route::post('/stock/rfids', [RfidController::class, 'store'])
-    ->middleware(['auth:api', 'permission:stock:create']);
+    ->middleware(['auth:api', 'permission:stock:create', 'throttle:10,1']);
 
 Route::post('/stock/bacs', [BacController::class, 'store'])
-    ->middleware(['auth:api', 'permission:stock:create']);
+    ->middleware(['auth:api', 'permission:stock:create', 'throttle:10,1']);
 
 Route::middleware(['auth:api', 'permission:stock:read'])->group(function () {
     Route::get('/cadre-commandes', [CadreCommandeController::class, 'index']);

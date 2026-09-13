@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Services\AuthService;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RefreshRequest;
+use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 
 class AuthController extends Controller
@@ -38,5 +40,23 @@ class AuthController extends Controller
                 'message' => $e->getMessage(),
             ], 401);
         }
+    }
+
+    public function logout(Request $request)
+    {
+        $request->validate([
+            'refreshToken' => ['nullable', 'string'],
+        ]);
+
+        auth('api')->logout();
+
+        if ($request->filled('refreshToken')) {
+            try {
+                JWTAuth::setToken($request->input('refreshToken'))->invalidate();
+            } catch (\Throwable) {
+            }
+        }
+
+        return response()->json(['message' => 'Logged out successfully']);
     }
 }

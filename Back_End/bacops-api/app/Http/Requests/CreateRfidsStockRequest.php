@@ -25,7 +25,7 @@ class CreateRfidsStockRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'rfids' => ['required', 'array', 'min:1'],
+            'rfids' => ['required', 'array', 'min:1', 'max:' . config('stock.max_rfid_items')],
             'rfids.*' => ['required', 'string', 'min:1', 'regex:/^[0-9A-Fa-f]+$/'],
             'commentaire' => ['sometimes', 'nullable', 'string'],
         ];

@@ -35,7 +35,7 @@ api.interceptors.response.use(
         await refreshPromise;
         return api(originalRequest);
       } catch (refreshError) {
-        useAuthStore.getState().logout();
+        await useAuthStore.getState().logout();
         return Promise.reject(refreshError);
       } finally {
         refreshPromise = null;
