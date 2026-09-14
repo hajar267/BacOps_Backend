@@ -22,6 +22,7 @@ class PVService
             'end_date' => $params['endDate'] ?? null,
             'filter_capacite' => $params['filterCapacite'] ?? null,
             'filter_matiere' => $params['filterMatiere'] ?? null,
+            'arrondissement_id' => $params['arrondissementId'] ?? null,
         ];
 
         $pv = PV::where($criteria)->whereNull('signed_at')->first();

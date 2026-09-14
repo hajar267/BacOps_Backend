@@ -25,6 +25,22 @@ export const locationService = {
     }));
   },
 
+  searchArrondissements: async (search: string): Promise<ArrondissementListItem[]> => {
+    const { data } = await api.get('/search/arrondissements', { params: { search } });
+    const items = data.data || data;
+    return items.map((raw: RawArrondissement) => ({
+      id: raw.id ?? 0,
+      name: raw.name ?? '',
+      ville: {
+        id: raw.ville?.id ?? 0,
+        name: raw.ville?.name ?? '',
+      },
+      prefecture: raw.prefecture
+        ? { id: raw.prefecture.id ?? 0, name: raw.prefecture.name ?? '' }
+        : null,
+    }));
+  },
+
   create: async (
     payload: CreateArrondissementPayload
   ): Promise<ArrondissementListItem> => {

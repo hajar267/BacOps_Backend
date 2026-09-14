@@ -36,6 +36,7 @@ class PVController extends Controller
                 'endDate' => $request->input('endDate'),
                 'filterCapacite' => $request->input('filterCapacite'),
                 'filterMatiere' => $request->input('filterMatiere'),
+                'arrondissementId' => $request->input('arrondissement_id'),
             ]);
 
             return response()->json(new PVResource($pv), 201);

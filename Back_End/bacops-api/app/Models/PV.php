@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Arrondissement;
 
 class PV extends Model
 {
@@ -18,6 +19,7 @@ class PV extends Model
         'end_date',
         'filter_capacite',
         'filter_matiere',
+        'arrondissement_id',
         'signed_pdf_url',
         'signed_at',
         'created_at',
@@ -32,5 +34,10 @@ class PV extends Model
     public function admin()
     {
         return $this->belongsTo(User::class, 'admin_id');
+    }
+
+    public function arrondissement()
+    {
+        return $this->belongsTo(Arrondissement::class);
     }
 }

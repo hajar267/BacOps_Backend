@@ -94,6 +94,7 @@ Route::middleware(['auth:api', 'permission:admin:read'])->group(function () {
     Route::get('/villes', [VilleController::class, 'index']);
     Route::get('/prefectures', [PrefectureController::class, 'index']);
     Route::get('/arrondissements', [ArrondissementController::class, 'index']);
+    Route::get('/search/arrondissements', [ArrondissementController::class, 'search']);
 });
 
 Route::middleware(['auth:api', 'permission:admin:create'])->group(function () {

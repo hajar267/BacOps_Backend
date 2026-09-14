@@ -52,6 +52,7 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
+      API_INTERNAL_URL: http://api:8000
     ports:
       - "${WEB_PORT:-3000}:3000"
     depends_on:

@@ -17,6 +17,28 @@ class ArrondissementController extends Controller
         );
     }
 
+    public function search(Request $request)
+    {
+        $search = trim((string) $request->query('search', ''));
+
+        if (mb_strlen($search) < 2) {
+            return response()->json([]);
+        }
+
+        $results = Arrondissement::with(['ville', 'prefecture'])
+            ->where(function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhereHas('ville', function ($villeQuery) use ($search) {
+                        $villeQuery->where('name', 'like', "%{$search}%");
+                    });
+            })
+            ->orderBy('name')
+            ->limit(20)
+            ->get();
+
+        return ArrondissementResource::collection($results);
+    }
+
     public function store(StoreArrondissementRequest $request)
     {
         $arrondissement = Arrondissement::create($request->only('ville_id', 'prefecture_id', 'name'));

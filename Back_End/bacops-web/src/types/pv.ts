@@ -38,6 +38,7 @@ export interface CreatePvPayload {
   contractNum?: string;
   filterCapacite?: string;
   filterMatiere?: string;
+  arrondissement_id?: number;
   startDate?: string;
   endDate?: string;
 }

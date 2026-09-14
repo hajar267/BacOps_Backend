@@ -28,6 +28,7 @@ class CreatePvRequest extends FormRequest
             'endDate' => ['sometimes', 'nullable', 'date'],
             'filterCapacite' => ['sometimes', 'nullable', 'string'],
             'filterMatiere' => ['sometimes', 'nullable', 'string'],
+            'arrondissement_id' => ['sometimes', 'nullable', 'integer', 'exists:arrondissements,id'],
         ];
     }
 }

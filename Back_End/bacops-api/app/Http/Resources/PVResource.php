@@ -16,6 +16,7 @@ class PVResource extends JsonResource
             'endDate' => $this->end_date,
             'filterCapacite' => $this->filter_capacite,
             'filterMatiere' => $this->filter_matiere,
+            'arrondissementId' => $this->arrondissement_id,
             'signedPdfUrl' => $this->signed_pdf_url,
             'isSigned' => (bool) $this->signed_at,
             'signedAt' => $this->signed_at,

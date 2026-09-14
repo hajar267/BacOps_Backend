@@ -21,15 +21,38 @@ export default function GeneratePvPage() {
   const [items, setItems] = useState<PreviewBacItem[]>([]);
 
   const [bacTypes, setBacTypes] = useState<BacTypeItem[]>([]);
-  const [arrondissements, setArrondissements] = useState<ArrondissementListItem[]>([]);
+  const [arrondissementQuery, setArrondissementQuery] = useState('');
+  const [arrondissementOptions, setArrondissementOptions] = useState<ArrondissementListItem[]>([]);
+  const [selectedArrondissement, setSelectedArrondissement] = useState<ArrondissementListItem | null>(null);
+  const [searchingArrondissements, setSearchingArrondissements] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    locationService.list().then(setArrondissements).catch(() => {});
     bacTypeService.list().then(setBacTypes).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    const query = arrondissementQuery.trim();
+
+    if (selectedArrondissement || query.length < 2) {
+      return;
+    }
+
+    const timeout = window.setTimeout(async () => {
+      setSearchingArrondissements(true);
+      try {
+        setArrondissementOptions(await locationService.searchArrondissements(query));
+      } catch {
+        setArrondissementOptions([]);
+      } finally {
+        setSearchingArrondissements(false);
+      }
+    }, 250);
+
+    return () => window.clearTimeout(timeout);
+  }, [arrondissementQuery, selectedArrondissement]);
 
   const availableNatures = useMemo(
     () => Array.from(new Set(bacTypes.map((b) => b.nature))).sort(),
@@ -55,8 +78,12 @@ const handlePreview = async () => {
   setLoading(true);
   setError(null);
   try {
+    if (arrondissementQuery.trim() && !selectedArrondissement) {
+      setError('Sélectionnez un arrondissement dans les suggestions ou choisissez « Tous ».');
+      return;
+    }
+
     const data = await pvService.preview(filters);
-    console.log('preview response:', data); // ← temporary, check devtools
     if (!Array.isArray(data)) {
       setError('Réponse inattendue du serveur');
       return;
@@ -67,8 +94,7 @@ const handlePreview = async () => {
     }
     setItems(data);
     setStep('preview');
-  } catch (e) {
-    console.error('preview error:', e); // ← temporary
+  } catch {
     setError('Erreur lors de la récupération des données');
   } finally {
     setLoading(false);
@@ -90,6 +116,7 @@ const handlePreview = async () => {
         contractNum: '2/GD/CR/2022',
         filterCapacite: filters.capacite !== ALL ? filters.capacite : undefined,
         filterMatiere: filters.matiere !== ALL ? filters.matiere : undefined,
+        arrondissement_id: filters.arrondissement_id,
         startDate: filters.startDate,
         endDate: filters.endDate,
       });
@@ -149,22 +176,58 @@ const handlePreview = async () => {
   options={[ALL, ...availableMatieres]}
   onChange={(v) => setFilters((f) => ({ ...f, matiere: v === ALL ? undefined : v }))}
 />
-<FilterSelect
-  label="Arrondissement"
-  value={
-    filters.arrondissement_id
-      ? arrondissements.find((a) => a.id === filters.arrondissement_id)?.name ?? ALL
-      : ALL
-  }
-  options={[ALL, ...arrondissements.map((a) => a.name)]}
-  onChange={(v) => {
-    const match = arrondissements.find((a) => a.name === v);
-    setFilters((f) => ({
-      ...f,
-      arrondissement_id: v === ALL ? undefined : match?.id,
-    }));
-  }}
-/></div>
+<div>
+  <label className="block text-sm font-semibold text-text-primary mb-1">Arrondissement</label>
+  <div className="relative">
+    <input
+      value={selectedArrondissement ? `${selectedArrondissement.name}, ${selectedArrondissement.ville.name}` : arrondissementQuery}
+      onChange={(event) => {
+        setSelectedArrondissement(null);
+        setArrondissementQuery(event.target.value);
+        setFilters((f) => ({ ...f, arrondissement_id: undefined }));
+      }}
+      placeholder="Rechercher par arrondissement ou ville"
+      className="w-full border border-surface-border rounded-lg px-3 py-2 text-sm"
+    />
+    <button
+      type="button"
+      onClick={() => {
+        setSelectedArrondissement(null);
+        setArrondissementQuery('');
+        setArrondissementOptions([]);
+        setFilters((f) => ({ ...f, arrondissement_id: undefined }));
+      }}
+      className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-semibold text-brand-primary"
+    >
+      Tous
+    </button>
+    {!selectedArrondissement && arrondissementQuery.trim().length >= 2 && (
+      <div className="absolute z-10 mt-1 w-full rounded-lg border border-surface-border bg-white shadow-lg">
+        {searchingArrondissements ? (
+          <p className="px-3 py-2 text-sm text-text-secondary">Recherche...</p>
+        ) : arrondissementOptions.length > 0 ? (
+          arrondissementOptions.map((arrondissement) => (
+            <button
+              type="button"
+              key={arrondissement.id}
+              onClick={() => {
+                setSelectedArrondissement(arrondissement);
+                setArrondissementQuery('');
+                setArrondissementOptions([]);
+                setFilters((f) => ({ ...f, arrondissement_id: arrondissement.id }));
+              }}
+              className="block w-full px-3 py-2 text-left text-sm hover:bg-surface-bg"
+            >
+              {arrondissement.name}, {arrondissement.ville.name}
+            </button>
+          ))
+        ) : (
+          <p className="px-3 py-2 text-sm text-text-secondary">Aucun résultat</p>
+        )}
+      </div>
+    )}
+  </div>
+</div></div>
 <div className="grid grid-cols-2 gap-4">
   <DatePickerField
     label="Date de début"
