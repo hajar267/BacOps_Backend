@@ -30,7 +30,7 @@ export function BacStatusDonutChart({ stats, isLoading }: BacStatusDonutChartPro
   const percentageOf = (value: number) => (total > 0 ? Math.round((value / total) * 100) : 0);
 
   return (
-    <div className="rounded-xl border border-border bg-white p-5">
+    <div className="min-w-0 overflow-hidden rounded-xl border border-border bg-white p-5">
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-text-primary">Statut des bacs</h3>
         <p className="text-xs text-text-secondary">Sur l&apos;ensemble du parc</p>

@@ -131,7 +131,7 @@ const handlePreview = async () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="mx-auto max-w-4xl p-4 sm:p-6">
       <h1 className="text-lg font-bold text-text-primary mb-6">Générer un rapport PV</h1>
 
       {error && (
@@ -142,7 +142,7 @@ const handlePreview = async () => {
 
       {step === 'filters' && (
         <div className="bg-white border border-surface-border rounded-xl p-6 space-y-4">
-<div className="grid grid-cols-2 gap-4">
+<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 <FilterSelect
   label="Nature"
   value={filters.nature ?? ALL}
@@ -169,7 +169,7 @@ const handlePreview = async () => {
   }
 /></div>
 
-<div className="grid grid-cols-2 gap-4">
+<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 <FilterSelect
   label="Matière"
   value={filters.matiere ?? ALL}
@@ -228,7 +228,7 @@ const handlePreview = async () => {
     )}
   </div>
 </div></div>
-<div className="grid grid-cols-2 gap-4">
+<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
   <DatePickerField
     label="Date de début"
     value={filters.startDate ? new Date(filters.startDate) : undefined}

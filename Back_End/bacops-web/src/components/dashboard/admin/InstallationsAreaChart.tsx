@@ -22,7 +22,7 @@ export function InstallationsAreaChart({ data, granularity, isLoading }: Install
   const isEmpty = data.every((point) => point.count === 0);
 
   return (
-    <div className="rounded-xl border border-border bg-white p-5">
+    <div className="min-w-0 overflow-hidden rounded-xl border border-border bg-white p-5">
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-text-primary">Bacs déployés</h3>
         <p className="text-xs text-text-secondary">Installations effectuées sur la période</p>
@@ -33,7 +33,7 @@ export function InstallationsAreaChart({ data, granularity, isLoading }: Install
       ) : data.length === 0 || isEmpty ? (
         <p className="py-10 text-center text-sm text-text-secondary">Aucune donnée disponible</p>
       ) : (
-        <ChartContainer config={chartConfig} className="h-[220px] w-full">
+        <ChartContainer config={chartConfig} className="h-[220px] min-w-0 max-w-full overflow-hidden">
           <AreaChart data={data} margin={{ left: -12, right: 12, top: 8 }}>
             <defs>
               <linearGradient id="fillCount" x1="0" y1="0" x2="0" y2="1">

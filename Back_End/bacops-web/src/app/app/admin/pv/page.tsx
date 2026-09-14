@@ -35,10 +35,10 @@ export default function PvListPage() {
   }, [load]);
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">PV</h1>
+          <h1 className="text-xl font-bold text-text-primary sm:text-2xl">PV</h1>
           <p className="text-sm text-text-secondary mt-1">Gérer les procès-verbaux</p>
         </div>
         <Link
@@ -49,8 +49,8 @@ export default function PvListPage() {
         </Link>
       </div>
 
-      <div className="bg-white border border-surface-border rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto rounded-xl border border-surface-border bg-white">
+        <table className="w-full min-w-[640px] text-sm">
           <thead className="bg-surface-bg text-text-secondary text-xs">
             <tr>
               <th className="text-left px-4 py-3 font-semibold">Numéro de contrat</th>

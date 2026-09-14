@@ -68,16 +68,16 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] flex-col gap-4 p-8">
+    <div className="flex min-h-[calc(100svh-3.5rem)] flex-col gap-4 overflow-auto p-4 sm:p-6 lg:p-8">
       <div>
-        <h1 className="text-2xl font-bold text-text-primary">Rechercher un bac</h1>
+        <h1 className="text-xl font-bold text-text-primary sm:text-2xl">Rechercher un bac</h1>
         <p className="mt-1 text-sm text-text-secondary">
           Recherchez par tag RFID ou sélectionnez un bac sur la carte
         </p>
       </div>
 
-      <div className="grid flex-1 grid-cols-1 gap-4 overflow-hidden lg:grid-cols-[360px_1fr]">
-        <div className="flex flex-col gap-4 overflow-y-auto">
+      <div className="grid flex-1 grid-cols-1 gap-4 lg:min-h-0 lg:grid-cols-[minmax(280px,360px)_1fr] lg:overflow-hidden">
+        <div className="order-2 flex min-h-0 flex-col gap-4 overflow-visible lg:order-1 lg:overflow-y-auto">
           <SearchBar isLoading={isLoading} onSearch={handleSearch} onClear={handleClear} />
 
           {error && (
@@ -91,12 +91,14 @@ export default function SearchPage() {
           )}
         </div>
 
-        <BacMapPanel
-          locations={locations}
-          selectedId={result?.id ?? null}
-          flyTarget={flyTarget}
-          onMarkerClick={handleMarkerClick}
-        />
+        <div className="order-1 min-h-[55svh] lg:order-2 lg:min-h-0">
+          <BacMapPanel
+            locations={locations}
+            selectedId={result?.id ?? null}
+            flyTarget={flyTarget}
+            onMarkerClick={handleMarkerClick}
+          />
+        </div>
       </div>
 
       <BacHistorySheet bac={result} open={historyOpen} onOpenChange={setHistoryOpen} />

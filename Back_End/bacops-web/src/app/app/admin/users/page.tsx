@@ -50,11 +50,11 @@ const handleUserUpdated = (updatedUser: UserListItem) => {
 };
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       {/* Header */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Gestion des utilisateurs</h1>
+          <h1 className="text-xl font-bold text-text-primary sm:text-2xl">Gestion des utilisateurs</h1>
           <p className="text-sm text-text-secondary mt-1">Gérer les utilisateurs du système</p>
         </div>
         <button
@@ -67,8 +67,8 @@ const handleUserUpdated = (updatedUser: UserListItem) => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-surface-border overflow-hidden">
-        <table className="w-full">
+      <div className="overflow-x-auto rounded-2xl border border-surface-border bg-white">
+        <table className="w-full min-w-[640px]">
           <thead>
             <tr className="bg-surface-bg border-b border-surface-border">
               <th className="text-left px-6 py-4 text-sm font-semibold text-text-secondary">

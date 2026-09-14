@@ -37,10 +37,10 @@ export default function CadreCommandePage() {
   };
 
   return (
-    <div className="p-8">
-      <div className="mb-6 flex items-start justify-between">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Cadre de commande</h1>
+          <h1 className="text-xl font-bold text-text-primary sm:text-2xl">Cadre de commande</h1>
           <p className="mt-1 text-sm text-text-secondary">Gérez le cadre de commande ici.</p>
         </div>
         <button

@@ -72,9 +72,9 @@ arrondissements.filter(
   );
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-text-primary">Gestion des lieux</h1>
+        <h1 className="text-xl font-bold text-text-primary sm:text-2xl">Gestion des lieux</h1>
         <p className="text-sm text-text-secondary mt-1">
           Villes, préfectures et arrondissements utilisés dans les installations
         </p>
@@ -93,7 +93,7 @@ arrondissements.filter(
         }}
       />
 
-      <div className="flex items-center justify-between mb-4 gap-3">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1 max-w-sm">
           <Search className="w-4 h-4 text-text-secondary absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -116,7 +116,7 @@ arrondissements.filter(
       {/* VILLES TABLE */}
       {activeTab === 'villes' && (
         <div className="bg-white rounded-2xl border border-surface-border overflow-hidden">
-          <table className="w-full">
+          <div className="overflow-x-auto"><table className="w-full min-w-140">
             <thead>
               <tr className="bg-surface-bg border-b border-surface-border">
                 <th className="text-left px-6 py-4 text-sm font-semibold text-text-secondary">Ville</th>
@@ -154,14 +154,14 @@ arrondissements.filter(
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 
       {/* PREFECTURES TABLE */}
       {activeTab === 'prefectures' && (
         <div className="bg-white rounded-2xl border border-surface-border overflow-hidden">
-          <table className="w-full">
+          <div className="overflow-x-auto"><table className="w-full min-w-140">
             <thead>
               <tr className="bg-surface-bg border-b border-surface-border">
                 <th className="text-left px-6 py-4 text-sm font-semibold text-text-secondary">Préfecture</th>
@@ -197,14 +197,14 @@ arrondissements.filter(
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 
       {/* ARRONDISSEMENTS TABLE */}
       {activeTab === 'arrondissements' && (
         <div className="bg-white rounded-2xl border border-surface-border overflow-hidden">
-          <table className="w-full">
+          <div className="overflow-x-auto"><table className="w-full min-w-175">
             <thead>
               <tr className="bg-surface-bg border-b border-surface-border">
                 <th className="text-left px-6 py-4 text-sm font-semibold text-text-secondary">Ville</th>
@@ -251,7 +251,7 @@ arrondissements.filter(
   </tr>
               ))}
             </tbody>          
-            </table>
+            </table></div>
         </div>
       )}
 

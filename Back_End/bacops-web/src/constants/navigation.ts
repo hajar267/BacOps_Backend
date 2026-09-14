@@ -71,11 +71,23 @@ export const NAV_ITEMS: Record<string, NavEntry[]> = {
     },
   ],
   magasin: [
+    // {
+    //   type: 'link',
+    //   label: 'Stock',
+    //   href: '/app/magasin',
+    //   icon: 'box',
+    // },
     {
       type: 'link',
-      label: 'Stock',
-      href: '/app/magasin',
-      icon: 'box',
+      label: 'Rechercher',
+      href: '/app/magasin/search',
+      icon: 'search',
+    },
+    {
+      type: 'link',
+      label: 'Décharges',
+      href: '/app/magasin/decharges',
+      icon: 'files',
     },
   ],
 };

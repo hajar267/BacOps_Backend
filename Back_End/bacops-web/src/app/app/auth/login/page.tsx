@@ -37,9 +37,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-svh flex flex-col lg:flex-row">
       {/* Left: branding panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-brand-primary items-center justify-center p-12">
+      <div className="hidden lg:flex lg:w-1/2 lg:min-h-svh bg-brand-primary items-center justify-center p-12">
         <div className="max-w-md text-white">
           <Image src="/arma_logo.jpg" alt="BacOps" width={96} height={96} className="mb-8 h-auto w-24" />
           <h2 className="text-3xl font-bold mb-4">Gestion des Bacs & RFID</h2>
@@ -50,19 +50,19 @@ export default function LoginPage() {
       </div>
 
       {/* Right: form */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center px-6 bg-surface-bg">
+      <div className="flex min-h-svh w-full items-start justify-center overflow-y-auto bg-surface-bg px-4 py-6 sm:px-6 sm:py-10 lg:min-h-svh lg:w-1/2 lg:items-center lg:px-8 lg:py-12">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-sm rounded-2xl p-10 bg-white shadow-sm shadow-black/5"
+          className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-sm shadow-black/5 sm:p-8 lg:p-10"
         >
-          <div className="flex flex-col items-center mb-8 lg:hidden">
-            <Image src="/arma_logo.jpg" alt="BacOps" width={96} height={96} className="mb-4 h-auto w-24" />
+          <div className="flex flex-col items-center mb-6 sm:mb-8 lg:hidden">
+            <Image src="/arma_logo.jpg" alt="BacOps" width={80} height={80} className="mb-3 h-auto w-20 sm:mb-4 sm:w-24" />
           </div>
 
           <h1 className="text-xl font-bold mb-1 text-text-primary">
             Connexion
           </h1>
-          <p className="text-sm text-text-secondary mb-6">
+          <p className="text-sm text-text-secondary mb-5 sm:mb-6">
             Accédez à votre espace BacOps
           </p>
 
@@ -72,6 +72,11 @@ export default function LoginPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Nom d'utilisateur"
+              autoComplete="username"
+              autoCapitalize="none"
+              autoCorrect="off"
+              enterKeyHint="next"
+              required
               className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-surface-border
                          focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20
                          outline-none transition-all text-text-primary placeholder:text-text-secondary/60"
@@ -85,6 +90,9 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Mot de passe"
+              autoComplete="current-password"
+              enterKeyHint="go"
+              required
               className="w-full pl-10 pr-10 py-2.5 rounded-lg border border-surface-border
                          focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20
                          outline-none transition-all text-text-primary placeholder:text-text-secondary/60"
@@ -100,9 +108,9 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 text-sm text-brand-error bg-brand-error/10 rounded-lg px-3 py-2 mb-4 mt-2">
+            <div role="alert" className="flex items-start gap-2 text-sm leading-5 text-brand-error bg-brand-error/10 rounded-lg px-3 py-2 mb-4 mt-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
-              {error}
+              <span className="min-w-0 wrap-break-word">{error}</span>
             </div>
           )}
 

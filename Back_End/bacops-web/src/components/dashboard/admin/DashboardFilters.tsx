@@ -85,7 +85,7 @@ export function DashboardFilters({ value, onApply }: DashboardFiltersProps) {
         )} */}
       </PopoverTrigger>
 
-      <PopoverContent align="end" className="w-80 space-y-4 border-border p-4">
+      <PopoverContent align="end" className="w-[calc(100vw-2rem)] max-w-80 space-y-4 border-border p-4">
         <div>
           <p className="text-sm font-semibold text-text-primary">Filtrer le tableau de bord</p>
           {/* <p className="mt-0.5 text-xs text-text-secondary">
@@ -107,7 +107,7 @@ export function DashboardFilters({ value, onApply }: DashboardFiltersProps) {
           }
         />
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <FilterSelect
             label="Capacité"
             value={draft.capacite ?? ALL}
@@ -128,7 +128,7 @@ export function DashboardFilters({ value, onApply }: DashboardFiltersProps) {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <DatePickerField
             label="Date de début"
             value={draft.from ? new Date(draft.from) : undefined}
@@ -145,7 +145,7 @@ export function DashboardFilters({ value, onApply }: DashboardFiltersProps) {
           />
         </div>
 
-        <div className="flex justify-end gap-2 pt-1">
+        <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end">
           <Button
             variant="ghost"
             onClick={handleReset}

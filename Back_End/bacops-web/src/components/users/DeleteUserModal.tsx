@@ -43,8 +43,8 @@ export function DeleteUserModal({
 
         <div className="flex items-center justify-between border-b border-surface-border px-6 py-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-error/15">
-              <Trash2 className="h-5 w-5 text-brand-error" />
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-state-error/15">
+              <Trash2 className="h-5 w-5 text-state-error" />
             </div>
 
             <h2 className="text-lg font-bold text-text-primary">
@@ -67,7 +67,7 @@ export function DeleteUserModal({
 
           <p className="text-sm text-text-secondary leading-6">
             Cette action est
-            <span className="font-semibold text-brand-error">
+              <span className="font-semibold text-state-error">
               {' '}irréversible{' '}
             </span>
             et supprimera définitivement cet utilisateur.
@@ -82,7 +82,7 @@ export function DeleteUserModal({
           </p>
 
           {error && (
-            <p className="mt-4 text-sm text-brand-error">
+            <p className="mt-4 text-sm text-state-error">
               {error}
             </p>
           )}
@@ -103,7 +103,7 @@ export function DeleteUserModal({
           <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className="flex items-center gap-2 rounded-lg bg-brand-error px-5 py-2.5 font-semibold text-white hover:opacity-90 disabled:opacity-70"
+            className="flex items-center gap-2 rounded-lg bg-state-error px-5 py-2.5 font-semibold text-white hover:opacity-90 disabled:opacity-70"
           >
             {isDeleting && (
               <Loader2 className="h-4 w-4 animate-spin" />

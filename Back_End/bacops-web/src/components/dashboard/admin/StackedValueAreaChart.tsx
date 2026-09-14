@@ -38,7 +38,7 @@ export function StackedValueAreaChart({ data, granularity, isLoading }: StackedV
   const isEmpty = chartData.every((p) => p.en_stock + p.en_service + p.perdu === 0);
 
   return (
-    <div className="rounded-xl border border-border bg-white p-5">
+    <div className="min-w-0 overflow-hidden rounded-xl border border-border bg-white p-5">
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-text-primary">Valeur des bacs par statut</h3>
         <p className="text-xs text-text-secondary">Valeur cumulée du parc, à date</p>
@@ -50,7 +50,7 @@ export function StackedValueAreaChart({ data, granularity, isLoading }: StackedV
         <p className="py-10 text-center text-sm text-text-secondary">Aucune donnée disponible</p>
       ) : (
         <>
-          <ChartContainer config={chartConfig} className="h-60 w-full">
+          <ChartContainer config={chartConfig} className="h-60 min-w-0 max-w-full overflow-hidden">
             <AreaChart data={chartData} margin={{ left: -12, right: 12, top: 8 }}>
               <defs>
                 {stackOrder.map((key) => (

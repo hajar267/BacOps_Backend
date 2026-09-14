@@ -37,10 +37,10 @@ export default function SuppliersPage() {
   };
 
   return (
-    <div className="p-8">
-      <div className="mb-6 flex items-start justify-between">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Fournisseurs</h1>
+          <h1 className="text-xl font-bold text-text-primary sm:text-2xl">Fournisseurs</h1>
           <p className="mt-1 text-sm text-text-secondary">Gérer la liste des fournisseurs</p>
         </div>
         <button

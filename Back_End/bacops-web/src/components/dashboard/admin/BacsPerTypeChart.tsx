@@ -30,7 +30,7 @@ export function BacsPerTypeChart({ data, isLoading }: BacsPerTypeChartProps) {
   const chartHeight = Math.max(48, chartData.length * 48);
 
   return (
-    <div className="rounded-xl border border-border bg-white p-5">
+    <div className="min-w-0 overflow-hidden rounded-xl border border-border bg-white p-5">
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-text-primary">Types de bacs</h3>
         <p className="text-xs text-text-secondary">
@@ -43,7 +43,7 @@ export function BacsPerTypeChart({ data, isLoading }: BacsPerTypeChartProps) {
       ) : chartData.length === 0 ? (
         <p className="py-10 text-center text-sm text-text-secondary">Aucune donnée disponible</p>
       ) : (
-        <ChartContainer config={chartConfig} className="w-full" style={{ height: chartHeight }}>
+        <ChartContainer config={chartConfig} className="min-w-0 max-w-full overflow-hidden" style={{ height: chartHeight }}>
           <BarChart
             accessibilityLayer
             data={chartData}

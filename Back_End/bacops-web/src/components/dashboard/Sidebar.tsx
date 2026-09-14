@@ -7,7 +7,7 @@ import {
   LogOut, LayoutDashboard, FileText, Users, Box, Tag,
   ListChecks, Settings, User, Lock, ChevronDown, 
   ChevronRight, Shield, MapPinned, Truck, FolderArchive,
-  Search, PanelLeftClose, PanelLeftOpen
+  Search, PanelLeftClose, PanelLeftOpen, X
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getInitials } from '@/utils/initials';
@@ -17,6 +17,7 @@ interface SidebarProps {
   items?: NavEntry[];
   collapsed?: boolean;
   onCollapsedChange?: (collapsed: boolean) => void;
+  onMobileClose?: () => void;
 }
 
 const ICONS: Record<string, React.ElementType> = {
@@ -37,7 +38,7 @@ const ICONS: Record<string, React.ElementType> = {
   search: Search,
 };
 
-export function Sidebar({ items, collapsed = false, onCollapsedChange }: SidebarProps) {
+export function Sidebar({ items, collapsed = false, onCollapsedChange, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
@@ -56,13 +57,13 @@ export function Sidebar({ items, collapsed = false, onCollapsedChange }: Sidebar
   return (
     <aside className={`h-screen flex flex-col bg-white border-r border-surface-border transition-[width] duration-200 ${collapsed ? 'w-16' : 'w-64'}`}>
       {/* User block */}
-      <div className={`relative border-b border-surface-border bg-brand-primary/6 ${collapsed ? 'p-3' : 'p-5'}`}>
+      <div className={`relative border-b border-surface-border bg-brand-primary/6 ${collapsed ? 'p-3 pb-8' : 'p-5 pb-8'}`}>
         <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
-          <div className="w-11 h-11 rounded-full bg-brand-primary/15 border border-brand-primary/20 flex items-center justify-center shrink-0">
+          {!collapsed && <div className="w-11 h-11 rounded-full bg-brand-primary/15 border border-brand-primary/20 flex items-center justify-center shrink-0">
             <span className="text-sm font-bold text-text-primary tracking-wide">
               {getInitials(user.firstName, user.lastName)}
             </span>
-          </div>
+          </div>}
           <div className={collapsed ? 'hidden' : 'min-w-0'}>
             <p className="font-bold text-text-primary truncate">
               {user.firstName} {user.lastName}
@@ -76,11 +77,21 @@ export function Sidebar({ items, collapsed = false, onCollapsedChange }: Sidebar
           <button
             type="button"
             onClick={() => onCollapsedChange(!collapsed)}
-            className="absolute right-2 bottom-2 flex h-8 w-8 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-white/60 hover:text-text-primary"
+            className="absolute right-2 bottom-2 hidden h-8 w-8 items-center justify-center rounded-lg bg-white text-text-secondary shadow-sm ring-1 ring-surface-border transition-colors hover:bg-surface-bg hover:text-text-primary md:flex"
             aria-label={collapsed ? 'Ouvrir la barre latérale' : 'Réduire la barre latérale'}
             title={collapsed ? 'Ouvrir la barre latérale' : 'Réduire la barre latérale'}
           >
             {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+          </button>
+        )}
+        {onMobileClose && (
+          <button
+            type="button"
+            onClick={onMobileClose}
+            className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-white/60 hover:text-text-primary md:hidden"
+            aria-label="Fermer la barre latérale"
+          >
+            <X className="h-4 w-4" />
           </button>
         )}
       </div>
@@ -100,6 +111,7 @@ export function Sidebar({ items, collapsed = false, onCollapsedChange }: Sidebar
                     ? 'bg-brand-primary/15 text-text-primary'
                     : 'text-text-secondary hover:bg-surface-bg'
                 }`}
+                onClick={onMobileClose}
               >
                 <Icon className="w-4.5 h-4.5" />
                 <span className={collapsed ? 'hidden' : ''}>{entry.label}</span>
@@ -139,6 +151,7 @@ export function Sidebar({ items, collapsed = false, onCollapsedChange }: Sidebar
                             ? 'bg-brand-primary/15 text-text-primary'
                             : 'text-text-secondary hover:bg-surface-bg'
                         }`}
+                        onClick={onMobileClose}
                       >
                         <ItemIcon className="w-4 h-4" />
                         {item.label}
@@ -156,6 +169,8 @@ export function Sidebar({ items, collapsed = false, onCollapsedChange }: Sidebar
       <div className={`border-t border-surface-border ${collapsed ? 'p-2' : 'p-4'}`}>
         <button
           onClick={handleLogout}
+          type="button"
+          onClickCapture={onMobileClose}
           className={`w-full flex items-center gap-3 rounded-lg py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-surface-bg ${collapsed ? 'justify-center px-1' : 'px-3'}`}
         >
           <LogOut className="w-4.5 h-4.5" />

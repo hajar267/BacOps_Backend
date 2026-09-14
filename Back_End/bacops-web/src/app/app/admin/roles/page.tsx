@@ -36,10 +36,10 @@ useEffect(() => {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex items-start justify-between mb-6">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Rôles et permissions</h1>
+          <h1 className="text-xl font-bold text-text-primary sm:text-2xl">Rôles et permissions</h1>
           <p className="text-sm text-text-secondary mt-1">
             Gérer les rôles et leurs droits d&apos;accès
           </p>

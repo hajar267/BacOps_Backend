@@ -34,9 +34,9 @@ export default function DechargeListPage() {
   }, [searchTerm, load]);
 
   return (
-    <div className="w-full mx-auto p-8">
+    <div className="mx-auto w-full p-4 sm:p-6 lg:p-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-text-primary">Décharges</h1>
+        <h1 className="text-xl font-bold text-text-primary sm:text-2xl">Décharges</h1>
         <p className="mt-1 text-sm text-text-secondary">Consulter les décharges bénéficiaires</p>
       </div>
 

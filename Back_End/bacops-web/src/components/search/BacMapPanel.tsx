@@ -18,7 +18,7 @@ interface BacMapPanelProps {
 
 export function BacMapPanel(props: BacMapPanelProps) {
   return (
-    <div className="h-full w-full overflow-hidden rounded-xl border border-border">
+    <div className="h-full min-h-[55svh] w-full overflow-hidden rounded-xl border border-border lg:min-h-0">
       <BacMapInner {...props} />
     </div>
   );
