@@ -36,7 +36,10 @@ export default function BacTypesPage() {
     if (!deletingItem) return;
 
     await bacTypeService.remove(deletingItem.id);
-    setBacTypes((prev) => prev.filter((t) => t.id !== deletingItem.id));
+    setBacTypes((prev) => prev.map((t) => (
+      t.id === deletingItem.id ? { ...t, isActive: false } : t
+    )));
+    setDeletingItem(null);
   };
 
   return (

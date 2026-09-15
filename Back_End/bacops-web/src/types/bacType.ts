@@ -29,4 +29,5 @@ export interface UpdateBacTypePayload {
   variante?: string | null;
   matiere?: string | null;
   color?: string | null;
+  isActive?: boolean;
 }

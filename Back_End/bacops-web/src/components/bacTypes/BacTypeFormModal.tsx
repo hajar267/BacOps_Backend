@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { bacTypeService } from '@/services/bacTypeService';
-import { BacTypeItem, CreateBacTypePayload } from '@/types/bacType';
+import { BacTypeItem, CreateBacTypePayload, UpdateBacTypePayload } from '@/types/bacType';
 
 interface BacTypeFormModalProps {
   mode?: 'create' | 'edit';
@@ -28,6 +28,7 @@ export function BacTypeFormModal({ mode = 'create', initialData, onClose, onSave
 
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
 
   useEffect(() => {
     Promise.all([
@@ -61,12 +62,13 @@ export function BacTypeFormModal({ mode = 'create', initialData, onClose, onSave
     setError(null);
 
     try {
-      const payload: CreateBacTypePayload = {
+      const payload: CreateBacTypePayload & UpdateBacTypePayload = {
         nature: form.nature.trim(),
         capacite: form.capacite?.trim() || null,
         variante: form.variante?.trim() || null,
         matiere: form.matiere?.trim() || null,
         color: form.color?.trim() || null,
+        ...(mode === 'edit' ? { isActive } : {}),
       };
 
       const saved =
@@ -145,6 +147,34 @@ export function BacTypeFormModal({ mode = 'create', initialData, onClose, onSave
             onChange={(v) => handleChange('variante', v)}
             placeholder="Renforcée"
           />
+
+          {mode === 'edit' && (
+            <button
+              type="button"
+              role="switch"
+              aria-checked={isActive}
+              onClick={() => setIsActive((active) => !active)}
+              className="flex w-full items-center justify-between rounded-lg border border-border px-3 py-2 text-left"
+            >
+              <span>
+                <span className="block text-xs text-text-secondary">Activation</span>
+                <span className="text-sm font-medium text-text-primary">
+                  {isActive ? 'Actif' : 'Désactivé'}
+                </span>
+              </span>
+              <span
+                className={`relative h-6 w-11 rounded-full transition-colors ${
+                  isActive ? 'bg-brand-primary' : 'bg-border'
+                }`}
+              >
+                <span
+                  className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
+                    isActive ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </span>
+            </button>
+          )}
         </div>
 
         <div className="mt-5 flex justify-end gap-2">

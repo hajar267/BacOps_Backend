@@ -21,6 +21,8 @@ class UserService
         $user = User::findOrFail($id);
 
         $updateData = [];
+        $firstName = $data['firstName'] ?? $user->first_name;
+        $lastName = $data['lastName'] ?? $user->last_name;
 
         // Map frontend camelCase payload to backend snake_case columns
         if (array_key_exists('firstName', $data)) {
@@ -29,6 +31,10 @@ class UserService
 
         if (array_key_exists('lastName', $data)) {
             $updateData['last_name'] = $data['lastName'];
+        }
+
+        if ($firstName !== $user->first_name || $lastName !== $user->last_name) {
+            $updateData['username'] = $this->generateUniqueUsername($firstName, $lastName, $user->id);
         }
 
         if (array_key_exists('email', $data)) {
@@ -73,7 +79,7 @@ class UserService
         return $user->load('role');
     }
 
-    private function generateUniqueUsername(string $firstName, string $lastName): string
+    private function generateUniqueUsername(string $firstName, string $lastName, ?int $exceptUserId = null): string
     {
         $normalizedFirstName = $this->normalizeUsernamePart($firstName);
         $normalizedLastName = $this->normalizeUsernamePart($lastName);
@@ -82,7 +88,7 @@ class UserService
         for ($prefixLength = 1; $prefixLength <= $firstNameLength; $prefixLength++) {
             $candidate = substr($normalizedFirstName, 0, $prefixLength).$normalizedLastName;
 
-            if (! User::withTrashed()->where('username', $candidate)->exists()) {
+            if (! $this->usernameExists($candidate, $exceptUserId)) {
                 return $candidate;
             }
         }
@@ -93,9 +99,17 @@ class UserService
         do {
             $candidate = $baseUsername.$suffix;
             $suffix++;
-        } while (User::withTrashed()->where('username', $candidate)->exists());
+        } while ($this->usernameExists($candidate, $exceptUserId));
 
         return $candidate;
+    }
+
+    private function usernameExists(string $username, ?int $exceptUserId = null): bool
+    {
+        return User::withTrashed()
+            ->where('username', $username)
+            ->when($exceptUserId !== null, fn ($query) => $query->whereKeyNot($exceptUserId))
+            ->exists();
     }
 
     private function normalizeUsernamePart(string $value): string

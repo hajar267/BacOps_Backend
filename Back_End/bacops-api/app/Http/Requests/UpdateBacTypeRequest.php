@@ -20,6 +20,7 @@ class UpdateBacTypeRequest extends FormRequest
             'variante' => ['sometimes', 'nullable', 'string', 'min:1'],
             'matiere'  => ['sometimes', 'present', 'nullable', 'string', 'min:1'],
             'color'    => ['sometimes', 'present', 'nullable', 'string', 'min:1'],
+            'isActive' => ['sometimes', 'boolean'],
         ];
     }
 }

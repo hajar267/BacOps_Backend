@@ -117,6 +117,7 @@ class BacTypeService
     $variante = array_key_exists('variante', $input) ? $this->normalizeNullableText($input['variante']) : $bacType->variante;
     $matiere  = array_key_exists('matiere', $input) ? $this->normalizeNullableText($input['matiere']) : $bacType->matiere;
     $color    = array_key_exists('color', $input) ? $this->normalizeNullableText($input['color']) : $bacType->color;
+    $isActive = array_key_exists('isActive', $input) ? (bool) $input['isActive'] : $bacType->is_active;
 
     if ($nature === '') {
         throw new BacTypeServiceException('Le champ nature ne doit pas être vide', 400);
@@ -144,6 +145,7 @@ class BacTypeService
         'variante' => $variante,
         'matiere' => $matiere,
         'color' => $color,
+        'is_active' => $isActive,
     ]);
 
     return $bacType;
